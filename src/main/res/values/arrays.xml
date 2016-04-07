@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="state_values">
+        <item>En départ</item>
+        <item>Sur place</item>
+        <item>En évacuation</item>
+        <item>En final</item>
+        <item>"Quitte l'hôpital"</item>
+        <item>Disponible</item>
+        <item>Indisponible</item>
+        <item>Rentré</item>
+    </string-array>
+</resources>
