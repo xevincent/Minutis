@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <PreferenceCategory android:title="@string/all_connection" >
-	<EditTextPreference
-		android:key="phone_number"
-		android:title="@string/pref_phone_number"
-		android:inputType="phone" />
-	<EditTextPreference
-		android:key="server_address"
-		android:title="@string/pref_server_address"
-		android:inputType="textUri" />
-  </PreferenceCategory>
-
   <PreferenceCategory android:title="@string/pref_notification" >
 	<SwitchPreference
 		android:key="notif_buzzer"
@@ -25,5 +14,16 @@
 		android:summary="@string/pref_gps_summary"
 		android:title="@string/pref_gps_title"
 		android:defaultValue="true" />
+  </PreferenceCategory>
+
+  <PreferenceCategory android:title="@string/all_connection" >
+	<EditTextPreference
+		android:key="phone_number"
+		android:title="@string/pref_phone_number"
+		android:inputType="phone" />
+	<EditTextPreference
+		android:key="server_address"
+		android:title="@string/pref_server_address"
+		android:inputType="textUri" />
   </PreferenceCategory>
 </PreferenceScreen>
