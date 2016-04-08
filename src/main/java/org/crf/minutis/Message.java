@@ -3,8 +3,8 @@ package org.crf.minutis;
 public class Message {
 
 	public enum Type {
-		PERSON(R.drawable.ic_person_black_36dp),
-		GROUP(R.drawable.ic_group_black_36dp);
+		PERSON(R.drawable.ic_person_black_24dp),
+		GROUP(R.drawable.ic_group_black_24dp);
 
 		public final int image;
 

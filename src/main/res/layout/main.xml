@@ -24,28 +24,28 @@
       android:layout_width="match_parent"
       android:background="@color/separator" />
 
-
-  <LinearLayout
-	  android:layout_width="match_parent"
-	  android:layout_height="wrap_content"
-	  android:minHeight="56dp"
-	  android:orientation="horizontal" >
+  <LinearLayout android:layout_width="match_parent"
+				android:layout_height="56dp"
+				android:orientation="horizontal"
+				android:paddingTop="8dip"
+				android:gravity="center_vertical"
+				android:layout_gravity="center_vertical" >
 
 	<ImageView
 		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
+		android:layout_height="wrap_content"
 		android:gravity="center_vertical"
 		android:layout_gravity="center_vertical"
 		android:paddingLeft="16dp"
 		android:tint="@color/accent"
-		android:src="@drawable/ic_message_black_36dp" />
+		android:src="@drawable/ic_message_black_24dp" />
 
 	<TextView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:gravity="center_vertical"
 		android:layout_gravity="center_vertical"
-		android:paddingLeft="20dp"
+		android:paddingLeft="32dp"
 		android:text="@string/main_messages"
 		android:textSize="16sp" />
 
@@ -55,7 +55,7 @@
       android:layout_height="1dp"
       android:layout_width="match_parent"
       android:background="@color/separator"
-	  android:layout_marginLeft="72dp"
+	  android:layout_marginLeft="62dp"
 	  android:layout_marginRight="16dp" />
 
   <ListView
@@ -66,10 +66,10 @@
       android:dividerHeight="1dp" />
 
   <ViewStub
-            android:id="@+id/empty_list"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout="@layout/no_message" />
+      android:id="@+id/empty_list"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+      android:layout_gravity="center"
+      android:layout="@layout/no_message" />
 </LinearLayout>
 

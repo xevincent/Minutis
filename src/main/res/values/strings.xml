@@ -6,8 +6,8 @@
   <string name="all_yes">Oui</string>
   <string name="all_cancel">Annuler</string>
   <string name="all_undefined">Non défini</string>
-  <string name="radio_code_description">Indicatif</string>
-  <string name="state_description">État</string>
+  <string name="radio_code_undefined">Indicatif non défini</string>
+  <string name="state_undefined">État non défini</string>
   <string name="main_messages">Messages</string>
   <string name="no_message">Aucun message reçu</string>
   <string name="main_select_state">Choisissez votre état</string>

@@ -17,12 +17,12 @@
 	<ImageView
 		android:id="@+id/message_image"
 		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
+		android:layout_height="wrap_content"
 		android:gravity="center_vertical"
 		android:layout_gravity="center_vertical"
 		android:paddingLeft="16dp"
 		android:tint="@color/accent"
-		android:src="@drawable/ic_person_black_36dp" />
+		android:src="@drawable/ic_person_black_24dp" />
 
 	<TextView
 		android:id="@+id/message_date"
@@ -30,7 +30,7 @@
 		android:layout_height="wrap_content"
 		android:gravity="center_vertical"
 		android:layout_gravity="center_vertical"
-		android:paddingLeft="20dp"
+		android:paddingLeft="32dp"
 		android:textSize="16sp" />
 
   </LinearLayout>
@@ -44,7 +44,8 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:gravity="center_vertical"
-        android:layout_weight="0.9"
+		android:layout_gravity="center_vertical"
+		android:layout_weight="0.9"
 		android:paddingLeft="72dp"
 		android:textSize="16sp"
 		/>
@@ -53,12 +54,12 @@
 		android:id="@+id/message_address"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-        android:layout_gravity="top"
+		android:layout_gravity="top"
 		android:paddingLeft="16dp"
 		android:paddingRight="16dp"
-        android:layout_weight="0.1"
+		android:layout_weight="0.1"
 		android:tint="@color/accent"
-		android:src="@drawable/ic_directions_black_36dp"
+		android:src="@drawable/ic_directions_black_24dp"
 		android:onClick="startNavigation" />
   </LinearLayout>
 </LinearLayout>
