@@ -8,6 +8,14 @@
   <string name="all_undefined">Non défini</string>
   <string name="radio_code_undefined">Indicatif non défini</string>
   <string name="state_undefined">État non défini</string>
+  <string name="state_starting">En départ</string>
+  <string name="state_on_site">Sur place</string>
+  <string name="state_evacuating">En évacuation</string>
+  <string name="state_ending">En final</string>
+  <string name="state_leaving_hospital">"Quitte l'hôpital"</string>
+  <string name="state_available">Disponible</string>
+  <string name="state_busy">Indisponible</string>
+  <string name="state_home">Rentré</string>
   <string name="main_messages">Messages</string>
   <string name="no_message">Aucun message reçu</string>
   <string name="main_select_state">Choisissez votre état</string>

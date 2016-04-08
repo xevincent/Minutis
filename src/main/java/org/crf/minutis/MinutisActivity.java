@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 public class MinutisActivity extends AppCompatActivity {
 
 	private boolean isConnected;
+	private int statePosition = -1;
 	private ArrayList<Message> messages;
 	private ListView lv;
 
@@ -106,10 +108,14 @@ public class MinutisActivity extends AppCompatActivity {
 	public void setStatus(View v) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.main_select_state)
-			.setItems(R.array.state_values, new DialogInterface.OnClickListener() {
+			.setAdapter(new StateAdapter(this, statePosition), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
+						statePosition = which;
+						State state = State.values()[which];
 						TextView tv = (TextView) findViewById (R.id.state_value);
-						tv.setText(getResources().getStringArray(R.array.state_values)[which]);
+						tv.setText(state.text);
+						ImageView iv = (ImageView) findViewById (R.id.state_icon);
+						iv.setImageResource(state.icon);
 					}
 				});
 		builder.create().show();
