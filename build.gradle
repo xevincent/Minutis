@@ -23,6 +23,8 @@ android {
   dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
 	compile 'com.android.support:design:23.2.1'
-	compile 'ch.acra:acra:4.8.5'
+	compile('ch.acra:acra:4.8.5') {
+		exclude group: 'org.json'
+	}
   }
 }
