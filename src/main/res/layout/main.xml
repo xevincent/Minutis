@@ -1,75 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			  android:orientation="vertical"
-			  android:layout_width="match_parent"
-			  android:layout_height="match_parent" >
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent" >
 
 
-  <include android:id="@+id/toolbar"
-		   layout="@layout/toolbar" />
+	<include android:id="@+id/toolbar"
+	         layout="@layout/toolbar" />
 
-  <include layout="@layout/radio_code" />
+	<include layout="@layout/state" />
 
-  <View
-      android:layout_height="1dp"
-      android:layout_width="match_parent"
-      android:background="@color/separator"
-	  android:layout_marginLeft="16dp"
-	  android:layout_marginRight="16dp" />
+	<ListView android:id="@+id/list_messages"
+	          android:layout_width="match_parent"
+	          android:layout_height="match_parent"
+	          android:paddingTop="8dp"
+	          android:paddingRight="8dp"
+	          android:paddingLeft="8dp"
+	          android:background="@color/separator"
+	          android:divider="@color/separator"
+	          android:dividerHeight="8dp" />
 
-  <include layout="@layout/state" />
-
-  <View
-      android:layout_height="7dp"
-      android:layout_width="match_parent"
-      android:background="@color/separator" />
-
-  <LinearLayout android:layout_width="match_parent"
-				android:layout_height="56dp"
-				android:orientation="horizontal"
-				android:paddingTop="8dip"
-				android:gravity="center_vertical"
-				android:layout_gravity="center_vertical" >
-
-	<ImageView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:gravity="center_vertical"
-		android:layout_gravity="center_vertical"
-		android:paddingLeft="16dp"
-		android:tint="@color/accent"
-		android:src="@drawable/ic_message_black_24dp" />
-
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center_vertical"
-		android:layout_gravity="center_vertical"
-		android:paddingLeft="32dp"
-		android:text="@string/main_messages"
-		android:textSize="16sp" />
-
-  </LinearLayout>
-
-  <View
-      android:layout_height="1dp"
-      android:layout_width="match_parent"
-      android:background="@color/separator"
-	  android:layout_marginLeft="62dp"
-	  android:layout_marginRight="16dp" />
-
-  <ListView
-	  android:id="@+id/list_messages"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-	  android:divider="@drawable/list_divider"
-      android:dividerHeight="1dp" />
-
-  <ViewStub
-      android:id="@+id/empty_list"
-	  android:layout_width="match_parent"
-	  android:layout_height="match_parent"
-      android:layout_gravity="center"
-      android:layout="@layout/no_message" />
+	<ViewStub android:id="@+id/empty_list"
+	          android:layout_width="match_parent"
+	          android:layout_height="match_parent"
+	          android:layout_gravity="center"
+	          android:layout="@layout/no_message" />
 </LinearLayout>
 
