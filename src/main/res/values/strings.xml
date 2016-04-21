@@ -6,6 +6,10 @@
   <string name="all_yes">Oui</string>
   <string name="all_cancel">Annuler</string>
   <string name="all_undefined">Non défini</string>
+  <string name="connect_is_connected">Vous êtes connecté au serveur</string>
+  <string name="connect_is_not_connected">"Vous n'êtes pas connecté au serveur"</string>
+  <string name="connect_connect">Se connecter</string>
+  <string name="connect_disconnect">Se déconnecter</string>
   <string name="radio_code_undefined">Indicatif non défini</string>
   <string name="state_undefined">État non défini</string>
   <string name="state_starting">En départ</string>

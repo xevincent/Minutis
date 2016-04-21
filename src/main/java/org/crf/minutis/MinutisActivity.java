@@ -78,11 +78,13 @@ public class MinutisActivity extends AppCompatActivity {
 	}
 
 	private void showConnect() {
-		String message = isConnected ? "Voulez-vous vous déconnecter du serveur ?" :
-			"Voulez-vous vous connecter au serveur ?";
+		int message = isConnected ? R.string.connect_is_connected :
+			R.string.connect_is_not_connected;
+		int action = isConnected ? R.string.connect_disconnect :
+			R.string.connect_connect;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
-			.setPositiveButton(R.string.all_yes, new DialogInterface.OnClickListener() {
+			.setPositiveButton(action, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						isConnected = !isConnected;
 					}
