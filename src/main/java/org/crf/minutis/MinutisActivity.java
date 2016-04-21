@@ -56,14 +56,6 @@ public class MinutisActivity extends AppCompatActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
-
-		// TODO doesn't work
-		// Drawable d = menu.findItem(R.id.connect).getIcon();
-		// d.mutate();
-		// d.setTint(R.color.text_primary);
-		// d.setColorFilter(R.color.text_primary,
-		// 				 PorterDuff.Mode.SRC_ATOP);
-		// menu.findItem(R.id.connect).setIcon(d);
 		return true;
 	}
 

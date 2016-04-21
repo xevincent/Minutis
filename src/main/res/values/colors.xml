@@ -3,6 +3,6 @@
   <item name="primary" type="color">#F44336</item>
   <item name="primary_dark" type="color">#B71C1C</item>
   <item name="accent" type="color">#F44336</item>
-  <item name="text_primary" type="color">#FFEBEE</item>
+  <item name="text_primary" type="color">#FFFFFF</item>
   <item name="separator" type="color">#FFCDD2</item>
 </resources>
