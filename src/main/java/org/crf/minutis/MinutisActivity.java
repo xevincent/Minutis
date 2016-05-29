@@ -2,10 +2,12 @@ package org.crf.minutis;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.graphics.drawable.Drawable;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -50,6 +52,12 @@ public class MinutisActivity extends AppCompatActivity {
 		lv.setEmptyView(findViewById(R.id.empty_list));
 		MessagesAdapter adapter = new MessagesAdapter(this, messages);
 		lv.setAdapter(adapter);
+
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		if (!sp.contains(SettingsFragment.KEY_SERVER_ADDRESS)) {
+			sp.edit().putString(SettingsFragment.KEY_SERVER_ADDRESS,
+			                    getString(R.string.default_server_address)).apply();
+		}
     }
 
 	@Override

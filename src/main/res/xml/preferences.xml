@@ -25,5 +25,8 @@
 		android:key="server_address"
 		android:title="@string/pref_server_address"
 		android:inputType="textUri" />
+	<Preference
+		android:key="reset_server_address"
+		android:title="@string/pref_reset_server_address" />
   </PreferenceCategory>
 </PreferenceScreen>

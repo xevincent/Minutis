@@ -7,13 +7,15 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.telephony.PhoneNumberUtils;
 
-public class SettingsFragment extends PreferenceFragment implements
-															 OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragment
+    implements OnSharedPreferenceChangeListener {
 
-	private static final String KEY_PHONE_NUMBER = "phone_number";
-	private static final String KEY_SERVER_ADDRESS = "server_address";
+	static final String KEY_PHONE_NUMBER = "phone_number";
+	private static final String KEY_RESET_SERVER_ADDRESS = "reset_server_address";
+	static final String KEY_SERVER_ADDRESS = "server_address";
 
 	private SharedPreferences mSharedPref;
 
@@ -54,6 +56,18 @@ public class SettingsFragment extends PreferenceFragment implements
             pref.setSummary(sp.getString(key, getString(R.string.all_undefined)));
 		}
     }
+
+	public boolean onPreferenceTreeClick (PreferenceScreen ps, Preference p) {
+		boolean ret;
+		if (KEY_RESET_SERVER_ADDRESS.equals(p.getKey())) {
+			mSharedPref.edit().putString(KEY_SERVER_ADDRESS,
+			                             getString(R.string.default_server_address)).apply();
+			ret = true;
+		} else {
+			ret = false;
+		}
+		return ret;
+	}
 
 	private String formatPhoneNumber(String phoneNumber) {
 		String formatedNumber;

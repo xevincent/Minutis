@@ -26,6 +26,7 @@
   <string name="no_navigation_app">Aucune application de géolocalisation trouvée</string>
   <string name="pref_phone_number">Numéro de téléphone</string>
   <string name="pref_server_address">Adresse du serveur</string>
+  <string name="pref_reset_server_address">"Réinitialiser l'adresse du serveur"</string>
   <string name="pref_privacy">Confidentialité</string>
   <string name="pref_gps_title">Activer le GPS</string>
   <string name="pref_gps_summary">Envoie la position du téléphone au serveur</string>
@@ -34,4 +35,7 @@
   <string name="pref_notif_buzzer_title">Activer le vibreur</string>
 
   <string name="crash_toast_text">Un  rapport de crash va  être envoyé par mail</string>
+
+  <!-- TODO Set the address but do not save it with git -->
+  <string name="default_server_address"></string>
 </resources>
