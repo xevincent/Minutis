@@ -9,6 +9,7 @@
     <item name="actionModeBackground">@color/primary_dark</item>
     <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
 	<item name="alertDialogTheme">@style/AlertDialogStyle</item>
+	<item name="editTextStyle">@style/EditTextStyle</item>
 	<item name="android:editTextStyle">@style/EditTextStyle</item>
   </style>
 
