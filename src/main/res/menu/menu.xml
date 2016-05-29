@@ -6,7 +6,7 @@
           android:title="@string/all_connection"
           app:showAsAction="always"/>
     <item android:id="@+id/settings"
-          android:title="@string/all_settings" />
+          android:title="@string/settings_name" />
     <item android:id="@+id/lorem_ipsum"
           android:title="Lorem ipsum" />
 </menu>

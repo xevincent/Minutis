@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">Minutis</string>
+  <string name="settings_name">Paramètres</string>
   <string name="all_connection">Connexion</string>
-  <string name="all_settings">Paramètres</string>
   <string name="all_yes">Oui</string>
   <string name="all_cancel">Annuler</string>
   <string name="all_undefined">Non défini</string>
@@ -24,7 +24,6 @@
   <string name="no_message">Aucun message reçu</string>
   <string name="main_select_state">Choisissez votre état</string>
   <string name="no_navigation_app">Aucune application de géolocalisation trouvée</string>
-  <string name="settings_title">Paramètres</string>
   <string name="pref_phone_number">Numéro de téléphone</string>
   <string name="pref_server_address">Adresse du serveur</string>
   <string name="pref_privacy">Confidentialité</string>
