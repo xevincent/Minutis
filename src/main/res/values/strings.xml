@@ -35,6 +35,8 @@
   <string name="pref_notification">Notification</string>
   <string name="pref_notif_buzzer_summary">"Vibrer à la réception d'un message"</string>
   <string name="pref_notif_buzzer_title">Activer le vibreur</string>
+  <string name="error_cannot_connect">Impossible de se connecter</string>
+  <string name="error_connect_first">"Connectez-vous pour changer d'état"</string>
 
   <string name="crash_toast_text">Un  rapport de crash va  être envoyé par mail</string>
 

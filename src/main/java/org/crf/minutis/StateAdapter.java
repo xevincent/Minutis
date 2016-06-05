@@ -12,7 +12,7 @@ import java.util.List;
 
 public class StateAdapter extends BaseAdapter {
 
-	private int statePosition;
+	private int currentStateCode;
 	private State[] mStates;
 	private final LayoutInflater mInflater;
 
@@ -21,10 +21,10 @@ public class StateAdapter extends BaseAdapter {
 		TextView text;
 	}
 
-	public StateAdapter(Context context, int statePosition) {
+	public StateAdapter(Context context, int currentStateCode) {
 		super();
 		mStates = State.values();
-		this.statePosition = statePosition;
+		this.currentStateCode = currentStateCode;
 		mInflater = LayoutInflater.from(context);
 	}
 
@@ -62,7 +62,7 @@ public class StateAdapter extends BaseAdapter {
 		if (state != null) {
 			holder.text.setText(state.text);
 			holder.icon.setImageResource(state.icon);
-			if (position == statePosition) {
+			if (state.code == currentStateCode) {
 				holder.text.setTypeface(Typeface.DEFAULT_BOLD);
 			} else {
 				holder.text.setTypeface(Typeface.DEFAULT);

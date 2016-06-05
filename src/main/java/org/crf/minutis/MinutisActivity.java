@@ -1,13 +1,21 @@
 package org.crf.minutis;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,13 +27,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-
 
 
 /* TODO
@@ -35,10 +42,26 @@ import java.util.ArrayList;
  */
 public class MinutisActivity extends AppCompatActivity {
 
-	private boolean isConnected;
-	private int statePosition = -1;
+	private boolean mIsBound;
 	private ArrayList<Message> messages;
+	private ImageView mStateIcon;
 	private ListView lv;
+	private MinutisService mService;
+	private TextView mStateText;
+
+
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (MinutisService.STATE_UPDATED.equals(intent.getAction())) {
+				updateState();
+			} else if (MinutisService.CONNECTION_SUCCESS.equals(intent.getAction())) {
+				setStatus(null);
+			} else if (MinutisService.CONNECTION_ERROR.equals(intent.getAction())) {
+				showSnackbar(R.string.error_cannot_connect);
+			}
+		}
+	};
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +70,9 @@ public class MinutisActivity extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
+		mStateText = (TextView) findViewById (R.id.state_value);
+		mStateIcon = (ImageView) findViewById (R.id.state_icon);
+
 		messages = new ArrayList<Message>();
 
 		lv = (ListView) findViewById(R.id.list_messages);
@@ -54,6 +80,35 @@ public class MinutisActivity extends AppCompatActivity {
 		MessagesAdapter adapter = new MessagesAdapter(this, messages);
 		lv.setAdapter(adapter);
     }
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(MinutisService.CONNECTION_ERROR);
+		filter.addAction(MinutisService.CONNECTION_SUCCESS);
+		filter.addAction(MinutisService.STATE_UPDATED);
+		LocalBroadcastManager bm = LocalBroadcastManager.getInstance(this);
+		bm.registerReceiver(mReceiver, filter);
+
+		bindIfServiceRunning();
+	}
+
+	@Override
+	protected void onPause() {
+		LocalBroadcastManager bm = LocalBroadcastManager.getInstance(this);
+		bm.unregisterReceiver(mReceiver);
+		super.onPause();
+	}
+
+	@Override
+	protected void onStop() {
+		if (mIsBound) {
+			unbindService(mConnection);
+			mIsBound = false;
+		}
+		super.onStop();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,16 +136,15 @@ public class MinutisActivity extends AppCompatActivity {
 	}
 
 	private void showConnect() {
-		int message = isConnected ? R.string.connect_is_connected :
+		int message = mIsBound ? R.string.connect_is_connected :
 			R.string.connect_is_not_connected;
-		int action = isConnected ? R.string.connect_disconnect :
+		int action = mIsBound ? R.string.connect_disconnect :
 			R.string.connect_connect;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
 			.setPositiveButton(action, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						isConnected = !isConnected;
-						if (isConnected) {
+						if (mIsBound) {
 							disconnect();
 						} else {
 							connect();
@@ -99,6 +153,7 @@ public class MinutisActivity extends AppCompatActivity {
 				})
 			.setNegativeButton(R.string.all_cancel, null);
         builder.create().show();
+	}
 
 	private void connect() {
 		final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
@@ -118,9 +173,14 @@ public class MinutisActivity extends AppCompatActivity {
 			dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 			dialog.show();
 		}
+		Intent service = new Intent(this, MinutisService.class);
+		startService(service);
+		bindService(service, mConnection, 0);
 	}
 
 	private void disconnect() {
+		Intent service = new Intent(this, MinutisService.class);
+		stopService(service);
 	}
 
 	private void startSettings() {
@@ -129,19 +189,34 @@ public class MinutisActivity extends AppCompatActivity {
 	}
 
 	public void setStatus(View v) {
+		if (!mIsBound) {
+			showSnackbar(R.string.error_connect_first);
+			return;
+		}
+		int currentStateCode = -1;
+		State state = mService.getState();
+		if (state != null) {
+			currentStateCode = state.code;
+		}
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.main_select_state)
-			.setAdapter(new StateAdapter(this, statePosition), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						statePosition = which;
-						State state = State.values()[which];
-						TextView tv = (TextView) findViewById (R.id.state_value);
-						tv.setText(state.text);
-						ImageView iv = (ImageView) findViewById (R.id.state_icon);
-						iv.setImageResource(state.icon);
-					}
-				});
+		    .setCancelable(currentStateCode != -1)
+		    .setAdapter(new StateAdapter(this, currentStateCode),
+		                new DialogInterface.OnClickListener() {
+		    	public void onClick(DialogInterface dialog, int which) {
+		    		State state = State.values()[which];
+		    		mService.updateState(state.code);
+		    	}
+		    });
 		builder.create().show();
+	}
+
+	public void updateState() {
+		State state = mService.getState();
+		if (state != null) {
+			mStateText.setText(state.text);
+			mStateIcon.setImageResource(state.icon);
+		}
 	}
 
 	public void startNavigation(View v) {
@@ -152,16 +227,53 @@ public class MinutisActivity extends AppCompatActivity {
 		if (intent.resolveActivity(getPackageManager()) != null) {
 			startActivity(intent);
 		} else {
-			Snackbar snackbar = Snackbar.make(lv, R.string.no_navigation_app, Snackbar.LENGTH_LONG);
-			int snackbarTextId = android.support.design.R.id.snackbar_text;
-			TextView tv = (TextView) snackbar.getView().findViewById(snackbarTextId);
-			tv.setTextColor(getResources().getColor(R.color.accent));
-			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-			snackbar.show();
+			showSnackbar(R.string.no_navigation_app);
 		}
 	}
 
 	private void addLoremIpsum() {
 		((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
 	}
+
+	private void showSnackbar(int res) {
+		Snackbar sb = Snackbar.make(lv, res, Snackbar.LENGTH_LONG);
+		int sbTextId = android.support.design.R.id.snackbar_text;
+		TextView tv = (TextView) sb.getView().findViewById(sbTextId);
+		tv.setTextColor(getResources().getColor(R.color.accent));
+		tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		sb.show();
+	}
+
+	private void bindIfServiceRunning() {
+		boolean isRunning = false;
+		ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		for (RunningServiceInfo rsi : am.getRunningServices(Integer.MAX_VALUE)){
+			if("org.crf.minutis.MinutisService".equals(rsi.service.getClassName())) {
+				isRunning = true;
+				break;
+			}
+		}
+
+		if (isRunning) {
+			Intent intent = new Intent(this, MinutisService.class);
+			bindService(intent, mConnection, 0);
+		}
+	}
+
+	private ServiceConnection mConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			MinutisService.LocalBinder binder = (MinutisService.LocalBinder) service;
+			mService = binder.getService();
+			mIsBound = true;
+			LocalBroadcastManager bm = LocalBroadcastManager.getInstance(MinutisActivity.this);
+			bm.sendBroadcast(new Intent(MinutisService.STATE_UPDATED));
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName arg0) {
+			mIsBound = false;
+		}
+	};
+
 }
