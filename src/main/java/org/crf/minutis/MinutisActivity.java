@@ -17,8 +17,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -94,11 +96,37 @@ public class MinutisActivity extends AppCompatActivity {
 			.setPositiveButton(action, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						isConnected = !isConnected;
+						if (isConnected) {
+							disconnect();
+						} else {
+							connect();
+						}
 					}
 				})
 			.setNegativeButton(R.string.all_cancel, null);
         builder.create().show();
 
+	private void connect() {
+		final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		if (sp.getString(SettingsFragment.KEY_PHONE_NUMBER, "").isEmpty()) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(R.string.dialog_phone_number_title)
+			    .setView(getLayoutInflater().inflate(R.layout.dialog_phone_number, null))
+			    .setPositiveButton(R.string.all_validate, new DialogInterface.OnClickListener() {
+			    	public void onClick(DialogInterface dialog, int id) {
+			    		EditText et = (EditText) ((AlertDialog) dialog).findViewById(R.id.phone_number);
+			    		String phone = et.getText().toString().replaceAll("\\s","");
+			    		sp.edit().putString(SettingsFragment.KEY_PHONE_NUMBER, phone).apply();
+			    	}
+			    })
+			    .setNegativeButton(R.string.all_cancel, null);
+			AlertDialog dialog = builder.create();
+			dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+			dialog.show();
+		}
+	}
+
+	private void disconnect() {
 	}
 
 	private void startSettings() {

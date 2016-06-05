@@ -4,6 +4,7 @@
   <string name="settings_name">Paramètres</string>
   <string name="all_connection">Connexion</string>
   <string name="all_yes">Oui</string>
+  <string name="all_validate">Valider</string>
   <string name="all_cancel">Annuler</string>
   <string name="all_undefined">Non défini</string>
   <string name="connect_is_connected">Vous êtes connecté au serveur</string>
@@ -24,6 +25,7 @@
   <string name="no_message">Aucun message reçu</string>
   <string name="main_select_state">Choisissez votre état</string>
   <string name="no_navigation_app">Aucune application de géolocalisation trouvée</string>
+  <string name="dialog_phone_number_title">Veuillez entrer votre numéro de téléphone</string>
   <string name="pref_phone_number">Numéro de téléphone</string>
   <string name="pref_server_address">Adresse du serveur</string>
   <string name="pref_reset_server_address">"Réinitialiser l'adresse du serveur"</string>
