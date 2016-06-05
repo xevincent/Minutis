@@ -130,6 +130,11 @@ public class MinutisActivity extends AppCompatActivity {
         case R.id.lorem_ipsum:
 			addLoremIpsum();
             return true;
+        case R.id.gps_test:
+			if (mIsBound) {
+				mService.updateGPS();
+			}
+            return true;
         default:
             return super.onOptionsItemSelected(item);
 		}

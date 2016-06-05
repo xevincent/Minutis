@@ -9,4 +9,6 @@
           android:title="@string/settings_name" />
     <item android:id="@+id/lorem_ipsum"
           android:title="Lorem ipsum" />
+    <item android:id="@+id/gps_test"
+          android:title="Test GPS" />
 </menu>
