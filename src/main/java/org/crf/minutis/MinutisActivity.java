@@ -53,12 +53,6 @@ public class MinutisActivity extends AppCompatActivity {
 		lv.setEmptyView(findViewById(R.id.empty_list));
 		MessagesAdapter adapter = new MessagesAdapter(this, messages);
 		lv.setAdapter(adapter);
-
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		if (!sp.contains(SettingsFragment.KEY_SERVER_ADDRESS)) {
-			sp.edit().putString(SettingsFragment.KEY_SERVER_ADDRESS,
-			                    getString(R.string.default_server_address)).apply();
-		}
     }
 
 	@Override

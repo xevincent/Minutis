@@ -30,7 +30,10 @@ public class SettingsFragment extends PreferenceFragment
 		Preference phoneNumberPref = findPreference(KEY_PHONE_NUMBER);
 		phoneNumberPref.setSummary(formatPhoneNumber(phoneNumber));
 
-		String serverAddress = mSharedPref.getString(KEY_SERVER_ADDRESS, getString(R.string.all_undefined));
+		String serverAddress = mSharedPref.getString(KEY_SERVER_ADDRESS, "").trim();
+		if (serverAddress.isEmpty()) {
+			serverAddress = BuildConfig.MINUTIS_URL;
+		}
 		Preference serverAddressPref = findPreference(KEY_SERVER_ADDRESS);
 		serverAddressPref.setSummary(serverAddress);
     }
@@ -53,7 +56,11 @@ public class SettingsFragment extends PreferenceFragment
             pref.setSummary(formatPhoneNumber(sp.getString(key, "")));
         } else if (KEY_SERVER_ADDRESS.equals(key)) {
             Preference pref = findPreference(KEY_SERVER_ADDRESS);
-            pref.setSummary(sp.getString(key, getString(R.string.all_undefined)));
+			String serverAddress = sp.getString(key, "").trim();
+			if (serverAddress.isEmpty()) {
+				serverAddress = BuildConfig.MINUTIS_URL;
+			}
+			pref.setSummary(serverAddress);
 		}
     }
 
@@ -61,7 +68,7 @@ public class SettingsFragment extends PreferenceFragment
 		boolean ret;
 		if (KEY_RESET_SERVER_ADDRESS.equals(p.getKey())) {
 			mSharedPref.edit().putString(KEY_SERVER_ADDRESS,
-			                             getString(R.string.default_server_address)).apply();
+			                             BuildConfig.MINUTIS_URL).apply();
 			ret = true;
 		} else {
 			ret = false;

@@ -38,6 +38,4 @@
 
   <string name="crash_toast_text">Un  rapport de crash va  être envoyé par mail</string>
 
-  <!-- TODO Set the address but do not save it with git -->
-  <string name="default_server_address"></string>
 </resources>
