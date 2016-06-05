@@ -186,6 +186,8 @@ public class MinutisActivity extends AppCompatActivity {
 	private void disconnect() {
 		Intent service = new Intent(this, MinutisService.class);
 		stopService(service);
+		mStateText.setText(R.string.state_undefined);
+		mStateIcon.setImageResource(R.drawable.ic_person_pin_black_24dp);
 	}
 
 	private void startSettings() {
