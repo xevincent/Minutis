@@ -59,6 +59,8 @@ public class MinutisActivity extends AppCompatActivity {
 				setStatus(null);
 			} else if (MinutisService.CONNECTION_ERROR.equals(intent.getAction())) {
 				showSnackbar(R.string.error_cannot_connect);
+			} else if (MinutisService.RADIO_CODE_UPDATED.equals(intent.getAction())) {
+				updateRadioCode();
 			}
 		}
 	};
@@ -226,6 +228,11 @@ public class MinutisActivity extends AppCompatActivity {
 		}
 	}
 
+	public void updateRadioCode() {
+		TextView radioCode = (TextView) findViewById (R.id.radio_code_value);
+		radioCode.setText(mService.getRadioCode());
+	}
+
 	public void startNavigation(View v) {
 		int position = lv.getPositionForView(v);
 		String address = messages.get(position).address;
@@ -273,8 +280,8 @@ public class MinutisActivity extends AppCompatActivity {
 			MinutisService.LocalBinder binder = (MinutisService.LocalBinder) service;
 			mService = binder.getService();
 			mIsBound = true;
-			LocalBroadcastManager bm = LocalBroadcastManager.getInstance(MinutisActivity.this);
-			bm.sendBroadcast(new Intent(MinutisService.STATE_UPDATED));
+			updateState();
+			updateRadioCode();
 		}
 
 		@Override

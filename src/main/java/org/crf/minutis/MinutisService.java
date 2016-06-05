@@ -27,11 +27,13 @@ public class MinutisService extends Service {
 
 	public static final String CONNECTION_ERROR = "connection_error";
 	public static final String CONNECTION_SUCCESS = "connection_success";
+	public static final String RADIO_CODE_UPDATED = "radio_code_updated";
 	public static final String STATE_UPDATED = "state_updated";
 
 	private final IBinder mBinder = new LocalBinder();
 	private Socket ioSocket;
 	private State mState;
+	private String mRadioCode;
 
 	public class LocalBinder extends Binder {
 		MinutisService getService() {
@@ -61,6 +63,8 @@ public class MinutisService extends Service {
 		ioSocket.on("update", onUpdate);
 
 		ioSocket.connect();
+
+		mRadioCode = getString(R.string.radio_code_undefined);
 
 		return START_STICKY;
 	}
@@ -95,6 +99,10 @@ public class MinutisService extends Service {
 
 	public boolean isConnected() {
 		return ioSocket.connected();
+	}
+
+	public String getRadioCode() {
+		return mRadioCode;
 	}
 
 	public State getState() {
@@ -179,6 +187,8 @@ public class MinutisService extends Service {
 				JSONObject json = (JSONObject) args[0];
 				if (json.has("status")) {
 					updateState(json);
+				} else if (json.has("indicatif")) {
+					updateRadioCode(json);
 				}
 
 				startForeground();
@@ -195,6 +205,17 @@ public class MinutisService extends Service {
 						notifyChanges(STATE_UPDATED);
 						break;
 					}
+				}
+			}
+
+			private void updateRadioCode(JSONObject json) {
+				String newRadioCode = "";
+				try {
+					newRadioCode = json.getString("indicatif");
+				} catch(JSONException ex) {}
+				if (!newRadioCode.isEmpty()) {
+					mRadioCode = newRadioCode;
+					notifyChanges(RADIO_CODE_UPDATED);
 				}
 			}
 		};
