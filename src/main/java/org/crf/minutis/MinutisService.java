@@ -82,11 +82,20 @@ public class MinutisService extends Service {
 	}
 
 	private void startForeground() {
-		int icon = mState != null ? mState.icon : R.drawable.ic_person_pin_black_24dp;
+		int icon;
+		String text;
+		if (mState == null) {
+			icon = R.drawable.ic_person_pin_black_24dp;
+			text = "";
+		} else {
+			icon = mState.icon;
+			text = getString(mState.text);
+		}
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
 		    .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_logo))
 		    .setSmallIcon(icon)
-		    .setContentTitle(getString(R.string.app_name));
+		    .setContentTitle(getString(R.string.app_name))
+		    .setContentText(text);
 
 		Intent intent = new Intent(this, MinutisActivity.class);
 		PendingIntent pIntent =
