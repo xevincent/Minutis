@@ -162,26 +162,39 @@ public class MinutisActivity extends AppCompatActivity {
         builder.create().show();
 	}
 
-	private void connect() {
+	private void fillPhoneNumber() {
 		final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.dialog_phone_number_title)
+		    .setView(getLayoutInflater().inflate(R.layout.dialog_phone_number, null))
+		    .setPositiveButton(R.string.all_validate, new DialogInterface.OnClickListener() {
+		    	public void onClick(DialogInterface dialog, int id) {
+		    		EditText et = (EditText) ((AlertDialog) dialog).findViewById(R.id.phone_number);
+		    		String phone = et.getText().toString().replaceAll("\\s","");
+		    		if (phone.isEmpty()) {
+		    			showSnackbar(R.string.error_cannot_connect_without_phone);
+		    		} else {
+		    			sp.edit().putString(SettingsFragment.KEY_PHONE_NUMBER, phone).apply();
+		    			connect();
+		    		}
+		    	}
+		    })
+		    .setNegativeButton(R.string.all_cancel, new DialogInterface.OnClickListener() {
+		    	public void onClick(DialogInterface dialog, int id) {
+		    		showSnackbar(R.string.error_cannot_connect_without_phone);
+		    	}
+		    })
+		    .setCancelable(false);
+		AlertDialog dialog = builder.create();
+		dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		dialog.show();
+	}
+
+	private void connect() {
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		if (sp.getString(SettingsFragment.KEY_PHONE_NUMBER, "").isEmpty()) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.dialog_phone_number_title)
-			    .setView(getLayoutInflater().inflate(R.layout.dialog_phone_number, null))
-			    .setPositiveButton(R.string.all_validate, new DialogInterface.OnClickListener() {
-			    	public void onClick(DialogInterface dialog, int id) {
-			    		EditText et = (EditText) ((AlertDialog) dialog).findViewById(R.id.phone_number);
-			    		String phone = et.getText().toString().replaceAll("\\s","");
-			    		sp.edit().putString(SettingsFragment.KEY_PHONE_NUMBER, phone).apply();
-			    	}
-			    })
-			    .setNegativeButton(R.string.all_cancel, null);
-			AlertDialog dialog = builder.create();
-			dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-			dialog.show();
-		}
-		if (sp.getString(SettingsFragment.KEY_PHONE_NUMBER, "").isEmpty()) {
-			showSnackbar(R.string.error_cannot_connect_without_phone);
+			fillPhoneNumber();
 		} else {
 			Intent service = new Intent(this, MinutisService.class);
 			startService(service);
