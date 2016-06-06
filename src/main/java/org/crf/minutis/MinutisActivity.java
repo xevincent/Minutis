@@ -180,9 +180,13 @@ public class MinutisActivity extends AppCompatActivity {
 			dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 			dialog.show();
 		}
-		Intent service = new Intent(this, MinutisService.class);
-		startService(service);
-		bindService(service, mConnection, 0);
+		if (sp.getString(SettingsFragment.KEY_PHONE_NUMBER, "").isEmpty()) {
+			showSnackbar(R.string.error_cannot_connect_without_phone);
+		} else {
+			Intent service = new Intent(this, MinutisService.class);
+			startService(service);
+			bindService(service, mConnection, 0);
+		}
 	}
 
 	private void disconnect() {
