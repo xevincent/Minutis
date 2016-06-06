@@ -32,7 +32,7 @@ public class SettingsFragment extends PreferenceFragment
 
 		String serverAddress = mSharedPref.getString(KEY_SERVER_ADDRESS, "").trim();
 		if (serverAddress.isEmpty()) {
-			serverAddress = BuildConfig.MINUTIS_URL;
+			serverAddress = getString(R.string.pref_default_server_address);
 		}
 		Preference serverAddressPref = findPreference(KEY_SERVER_ADDRESS);
 		serverAddressPref.setSummary(serverAddress);
@@ -58,7 +58,7 @@ public class SettingsFragment extends PreferenceFragment
             Preference pref = findPreference(KEY_SERVER_ADDRESS);
 			String serverAddress = sp.getString(key, "").trim();
 			if (serverAddress.isEmpty()) {
-				serverAddress = BuildConfig.MINUTIS_URL;
+				serverAddress = getString(R.string.pref_default_server_address);
 			}
 			pref.setSummary(serverAddress);
 		}
@@ -67,8 +67,7 @@ public class SettingsFragment extends PreferenceFragment
 	public boolean onPreferenceTreeClick (PreferenceScreen ps, Preference p) {
 		boolean ret;
 		if (KEY_RESET_SERVER_ADDRESS.equals(p.getKey())) {
-			mSharedPref.edit().putString(KEY_SERVER_ADDRESS,
-			                             BuildConfig.MINUTIS_URL).apply();
+			mSharedPref.edit().remove(KEY_SERVER_ADDRESS).apply();
 			ret = true;
 		} else {
 			ret = false;

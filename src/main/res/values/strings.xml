@@ -28,6 +28,7 @@
   <string name="dialog_phone_number_title">Veuillez entrer votre numéro de téléphone</string>
   <string name="pref_phone_number">Numéro de téléphone</string>
   <string name="pref_server_address">Adresse du serveur</string>
+  <string name="pref_default_server_address">Adresse du serveur par défaut</string>
   <string name="pref_reset_server_address">"Réinitialiser l'adresse du serveur"</string>
   <string name="pref_privacy">Confidentialité</string>
   <string name="pref_gps_title">Activer le GPS</string>
