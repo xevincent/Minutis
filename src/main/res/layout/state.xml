@@ -38,6 +38,7 @@
 		          android:layout_height="wrap_content"
 		          android:gravity="center_vertical"
 		          android:layout_gravity="center_vertical"
+		          android:visibility="gone"
 		          android:text="@string/radio_code_undefined"
 		          android:alpha="0.54"
 		          android:textSize="14sp" />
