@@ -207,6 +207,8 @@ public class MinutisActivity extends AppCompatActivity {
 		stopService(service);
 		mStateText.setText(R.string.state_undefined);
 		mStateIcon.setImageResource(R.drawable.ic_person_pin_black_24dp);
+		TextView radioCode = (TextView) findViewById (R.id.radio_code_value);
+		radioCode.setText("");
 	}
 
 	private void startSettings() {

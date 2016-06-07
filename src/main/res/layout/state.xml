@@ -2,9 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:minHeight="72dp"
+              android:minHeight="56dp"
               android:orientation="horizontal"
               android:paddingTop="8dip"
+              android:onClick="setStatus"
               android:gravity="center_vertical"
               android:layout_gravity="center_vertical" >
 
@@ -18,9 +19,9 @@
 	           android:src="@drawable/ic_person_pin_black_24dp" />
 
 
-	<LinearLayout android:layout_width="wrap_content"
+	<LinearLayout android:layout_width="match_parent"
 	              android:layout_height="wrap_content"
-	              android:orientation="vertical"
+	              android:orientation="horizontal"
 	              android:gravity="center_vertical"
 	              android:layout_gravity="center_vertical"
 	              android:paddingLeft="32dp" >
@@ -33,31 +34,18 @@
 		          android:text="@string/state_undefined"
 		          android:textSize="16sp" />
 
+		<Space android:layout_width="0dp"
+		       android:layout_height="0dp"
+		       android:layout_weight="1" />
+
 		<TextView android:id="@+id/radio_code_value"
 		          android:layout_width="wrap_content"
 		          android:layout_height="wrap_content"
 		          android:gravity="center_vertical"
 		          android:layout_gravity="center_vertical"
-		          android:visibility="gone"
-		          android:text="@string/radio_code_undefined"
-		          android:alpha="0.54"
-		          android:textSize="14sp" />
+		          android:paddingRight="32dp"
+		          android:textSize="16sp" />
 
 	</LinearLayout>
-
-	<Space android:layout_width="0dp"
-	       android:layout_height="0dp"
-	       android:layout_weight="1" />
-
-	<ImageView android:id="@+id/state_edit"
-	           android:layout_width="wrap_content"
-	           android:layout_height="wrap_content"
-	           android:gravity="center_vertical"
-	           android:layout_gravity="center_vertical"
-	           android:paddingRight="16dp"
-	           android:paddingLeft="72dp"
-	           android:tint="@color/accent"
-	           android:src="@drawable/ic_mode_edit_black_24dp"
-	           android:onClick="setStatus" />
 
 </LinearLayout>

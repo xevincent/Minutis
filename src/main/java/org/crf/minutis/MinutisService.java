@@ -33,7 +33,7 @@ public class MinutisService extends Service {
 	private final IBinder mBinder = new LocalBinder();
 	private Socket ioSocket;
 	private State mState;
-	private String mRadioCode;
+	private String mRadioCode = "";
 
 	public class LocalBinder extends Binder {
 		MinutisService getService() {
@@ -63,8 +63,6 @@ public class MinutisService extends Service {
 		ioSocket.on("update", onUpdate);
 
 		ioSocket.connect();
-
-		mRadioCode = getString(R.string.radio_code_undefined);
 
 		return START_STICKY;
 	}
