@@ -10,6 +10,11 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.telephony.PhoneNumberUtils;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+
 public class SettingsFragment extends PreferenceFragment
     implements OnSharedPreferenceChangeListener {
 
@@ -51,9 +56,22 @@ public class SettingsFragment extends PreferenceFragment
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
-        if (KEY_PHONE_NUMBER.equals(key)) {
-            Preference pref = findPreference(KEY_PHONE_NUMBER);
-            pref.setSummary(formatPhoneNumber(sp.getString(key, "")));
+		if (KEY_PHONE_NUMBER.equals(key)) {
+			String phone = sp.getString(key, "");
+			if (phoneNumberIsValid(phone)) {
+				PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+				try {
+					PhoneNumber numberProto = phoneUtil.parse(phone, "FR");
+					phone = phoneUtil.format(numberProto, PhoneNumberFormat.NATIONAL)
+					    .replaceAll("\\s","");
+				} catch (NumberParseException e) {
+				}
+				sp.edit().putString(SettingsFragment.KEY_PHONE_NUMBER, phone).apply();
+			} else {
+				sp.edit().remove(KEY_PHONE_NUMBER).apply();
+			}
+			Preference pref = findPreference(KEY_PHONE_NUMBER);
+			pref.setSummary(formatPhoneNumber(sp.getString(key, "")));
         } else if (KEY_SERVER_ADDRESS.equals(key)) {
             Preference pref = findPreference(KEY_SERVER_ADDRESS);
 			String serverAddress = sp.getString(key, "").trim();
@@ -75,16 +93,26 @@ public class SettingsFragment extends PreferenceFragment
 		return ret;
 	}
 
+	private boolean phoneNumberIsValid(String phone) {
+		boolean ret;
+		PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+		try {
+			PhoneNumber numberProto = phoneUtil.parse(phone, "FR");
+			ret = phoneUtil.isValidNumber(numberProto);
+		} catch (NumberParseException e) {
+			ret = false;
+		}
+		return ret;
+	}
+
 	private String formatPhoneNumber(String phoneNumber) {
 		String formatedNumber;
-		if (phoneNumber.isEmpty()) {
+		PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+		try {
+			PhoneNumber numberProto = phoneUtil.parse(phoneNumber, "FR");
+			formatedNumber = phoneUtil.format(numberProto, PhoneNumberFormat.NATIONAL);
+		} catch (NumberParseException e) {
 			formatedNumber = getString(R.string.all_undefined);
-		} else {
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-				formatedNumber = PhoneNumberUtils.formatNumber(phoneNumber);
-			} else {
-				formatedNumber = PhoneNumberUtils.formatNumber(phoneNumber, "FR");
-			}
 		}
 		return formatedNumber;
 	}

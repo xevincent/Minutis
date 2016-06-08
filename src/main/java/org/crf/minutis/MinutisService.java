@@ -60,6 +60,8 @@ public class MinutisService extends Service {
 		ioSocket.on(Socket.EVENT_CONNECT, onConnect);
 		ioSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
 		ioSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+		ioSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
+		ioSocket.on(Socket.EVENT_RECONNECT, onReconnect);
 		ioSocket.on("update", onUpdate);
 
 		ioSocket.connect();
@@ -73,6 +75,9 @@ public class MinutisService extends Service {
 		ioSocket.off(Socket.EVENT_CONNECT, onConnect);
 		ioSocket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
 		ioSocket.off(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+		ioSocket.off(Socket.EVENT_DISCONNECT, onDisconnect);
+		ioSocket.off(Socket.EVENT_RECONNECT, onReconnect);
+		ioSocket.off("update", onUpdate);
 		if(ioSocket.connected()) {
 			ioSocket.disconnect();
 		}
@@ -177,6 +182,9 @@ public class MinutisService extends Service {
 				ioSocket.emit("register", phone);
 				startForeground();
 				notifyChanges(CONNECTION_SUCCESS);
+				ioSocket.off(Socket.EVENT_CONNECT, onConnect);
+				ioSocket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
+				ioSocket.off(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
 			}
 		};
 
@@ -184,9 +192,29 @@ public class MinutisService extends Service {
 			@Override
 			public void call(Object... args) {
 				notifyChanges(CONNECTION_ERROR);
-				stopSelf();
 			}
 		};
+
+	private Emitter.Listener onDisconnect = new Emitter.Listener() {
+		@Override
+		public void call(Object... args) {
+			// TODO
+		}
+	};
+
+	private Emitter.Listener onReconnect = new Emitter.Listener() {
+		@Override
+		public void call(Object... args) {
+			SharedPreferences sp =
+			    PreferenceManager.getDefaultSharedPreferences(MinutisService.this);
+			JSONObject phone = new JSONObject();
+			try {
+				phone.put("phone", sp.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));
+			} catch(JSONException ex) {}
+			ioSocket.emit("register", phone);
+			// TODO send unsend messages
+		}
+	};
 
 	private Emitter.Listener onUpdate = new Emitter.Listener() {
 			@Override

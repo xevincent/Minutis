@@ -34,6 +34,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 
 /* TODO
  * - reset screen when disconnected
@@ -59,6 +63,7 @@ public class MinutisActivity extends AppCompatActivity {
 				setStatus(null);
 			} else if (MinutisService.CONNECTION_ERROR.equals(intent.getAction())) {
 				showSnackbar(R.string.error_cannot_connect);
+				disconnect();
 			} else if (MinutisService.RADIO_CODE_UPDATED.equals(intent.getAction())) {
 				updateRadioCode();
 			}
@@ -171,12 +176,19 @@ public class MinutisActivity extends AppCompatActivity {
 		    .setPositiveButton(R.string.all_validate, new DialogInterface.OnClickListener() {
 		    	public void onClick(DialogInterface dialog, int id) {
 		    		EditText et = (EditText) ((AlertDialog) dialog).findViewById(R.id.phone_number);
-		    		String phone = et.getText().toString().replaceAll("\\s","");
-		    		if (phone.isEmpty()) {
-		    			showSnackbar(R.string.error_cannot_connect_without_phone);
-		    		} else {
+		    		String phone = et.getText().toString();
+		    		if (phoneNumberIsValid(phone)) {
+		    			PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+		    			try {
+		    				PhoneNumber numberProto = phoneUtil.parse(phone, "FR");
+		    				phone = phoneUtil.format(numberProto, PhoneNumberFormat.NATIONAL)
+		    				    .replaceAll("\\s","");
+		    			} catch (NumberParseException e) {
+		    			}
 		    			sp.edit().putString(SettingsFragment.KEY_PHONE_NUMBER, phone).apply();
 		    			connect();
+		    		} else {
+		    			showSnackbar(R.string.error_cannot_connect_without_phone);
 		    		}
 		    	}
 		    })
@@ -191,14 +203,26 @@ public class MinutisActivity extends AppCompatActivity {
 		dialog.show();
 	}
 
+	private boolean phoneNumberIsValid(String phone) {
+		boolean ret;
+		PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+		try {
+			PhoneNumber numberProto = phoneUtil.parse(phone, "FR");
+			ret = phoneUtil.isValidNumber(numberProto);
+		} catch (NumberParseException e) {
+			ret = false;
+		}
+		return ret;
+	}
+
 	private void connect() {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		if (sp.getString(SettingsFragment.KEY_PHONE_NUMBER, "").isEmpty()) {
-			fillPhoneNumber();
-		} else {
+		if (phoneNumberIsValid(sp.getString(SettingsFragment.KEY_PHONE_NUMBER, ""))) {
 			Intent service = new Intent(this, MinutisService.class);
 			startService(service);
 			bindService(service, mConnection, 0);
+		} else {
+			fillPhoneNumber();
 		}
 	}
 
