@@ -1,77 +1,70 @@
 package org.crf.minutis;
 
 import android.content.Context;
-import android.view.LayoutInflater;
+import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ResourceCursorAdapter;
 
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class MessagesAdapter extends BaseAdapter {
+public class MessagesAdapter extends ResourceCursorAdapter {
 
-    private List<Message> mLocalList;
-    private final LayoutInflater mInflater;
-
-    static class ViewHolder {
+	static class ViewHolder {
 		ImageView address;
 		ImageView type;
-        TextView date;
-        TextView content;
-    }
+		TextView date;
+		TextView content;
+	}
 
-    public MessagesAdapter(Context context, List<Message> appList) {
-        super();
-        mLocalList = appList;
-        mInflater = LayoutInflater.from(context);
-    }
+	private SimpleDateFormat sdf;
 
-    public int getCount() {
-        return mLocalList.size();
-    }
+	public MessagesAdapter(Context context, int layout, Cursor c, int flags) {
+		super(context, layout, c, flags);
+		sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+	}
 
-    public Object getItem(int position) {
-        return mLocalList.get(position);
-    }
+	@Override
+	public View newView(Context context, Cursor cursor, ViewGroup parent) {
+		View view = super.newView(context, cursor, parent);
 
-    public long getItemId(int position) {
-        return position;
-    }
+		ViewHolder holder = new ViewHolder();
+		holder.content = (TextView) view.findViewById(R.id.message_content);
+		holder.date = (TextView) view.findViewById(R.id.message_date);
+		holder.address = (ImageView) view.findViewById(R.id.message_address);
+		holder.type = (ImageView) view.findViewById(R.id.message_image);
+		view.setTag(holder);
 
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (position >= mLocalList.size()) {
-            return null;
+		return view;
+	}
+
+	@Override
+	public void bindView(View view, Context context, Cursor cursor) {
+		ViewHolder holder = (ViewHolder) view.getTag();
+		holder.content.setText(cursor.getString(3));
+		holder.date.setText(sdf.format(new Date(cursor.getLong(2))));
+		int icon;
+		int type = cursor.getInt(1);
+		switch(type) {
+		case 0:
+			icon = R.drawable.ic_person_black_24dp;
+			break;
+		case 1:
+			icon = R.drawable.ic_group_black_24dp;
+			break;
+		default:
+			// Should never happen
+			icon = R.drawable.ic_message_black_24dp;
+			break;
 		}
-
-        ViewHolder holder;
-
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.message, null);
-
-            holder = new ViewHolder();
-            holder.content = (TextView) convertView.findViewById(R.id.message_content);
-            holder.date = (TextView) convertView.findViewById(R.id.message_date);
-            holder.address = (ImageView) convertView.findViewById(R.id.message_address);
-            holder.type = (ImageView) convertView.findViewById(R.id.message_image);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-
-        Message message = (Message) mLocalList.get(position);
-        if (message != null) {
-            holder.content.setText(message.message);
-            holder.date.setText(message.date);
-            holder.type.setImageResource(message.type.image);
-			if (message.address.isEmpty()) {
-				holder.address.setVisibility(View.INVISIBLE);
-			} else {
-				holder.address.setVisibility(View.VISIBLE);
-			}
-        }
-
-        return convertView;
-    }
+		holder.type.setImageResource(icon);
+		if (cursor.getString(4).isEmpty()) {
+			holder.address.setVisibility(View.INVISIBLE);
+		} else {
+			holder.address.setVisibility(View.VISIBLE);
+		}
+	}
 }

@@ -3,8 +3,10 @@ package org.crf.minutis;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
@@ -27,6 +29,7 @@ public class MinutisService extends Service {
 
 	public static final String CONNECTION_ERROR = "connection_error";
 	public static final String CONNECTION_SUCCESS = "connection_success";
+	public static final String MESSAGE_RECEIVED = "message_received";
 	public static final String RADIO_CODE_UPDATED = "radio_code_updated";
 	public static final String STATE_UPDATED = "state_updated";
 
@@ -63,6 +66,7 @@ public class MinutisService extends Service {
 		ioSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
 		ioSocket.on(Socket.EVENT_RECONNECT, onReconnect);
 		ioSocket.on("update", onUpdate);
+		ioSocket.on("message", onMessage);
 
 		ioSocket.connect();
 
@@ -78,6 +82,7 @@ public class MinutisService extends Service {
 		ioSocket.off(Socket.EVENT_DISCONNECT, onDisconnect);
 		ioSocket.off(Socket.EVENT_RECONNECT, onReconnect);
 		ioSocket.off("update", onUpdate);
+		ioSocket.off("message", onMessage);
 		if(ioSocket.connected()) {
 			ioSocket.disconnect();
 		}
@@ -254,4 +259,26 @@ public class MinutisService extends Service {
 				}
 			}
 		};
+
+	private Emitter.Listener onMessage = new Emitter.Listener() {
+		@Override
+		public void call(Object... args) {
+			JSONObject json = (JSONObject) args[0];
+			try {
+				ContentValues cv = new ContentValues();
+				cv.put("type", json.getInt("type"));
+				cv.put("date", json.getLong("time"));
+				cv.put("content", json.getString("text"));
+				if (json.has("address")) {
+					cv.put("address", json.getString("address"));
+				}
+
+				MessageDBHelper helper = new MessageDBHelper(MinutisService.this);
+				SQLiteDatabase db = helper.getWritableDatabase();
+				db.insert("messages", null, cv);
+				helper.close();
+				notifyChanges(MESSAGE_RECEIVED);
+			} catch(JSONException ex) {}
+		}
+	};
 }

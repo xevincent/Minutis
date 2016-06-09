@@ -2,14 +2,19 @@ package org.crf.minutis;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.Loader;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -32,8 +37,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -44,12 +47,13 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
  * - selector for edit, direction and connection
  * - check @ and phone number when connection
  */
-public class MinutisActivity extends AppCompatActivity {
+public class MinutisActivity extends AppCompatActivity implements
+    LoaderManager.LoaderCallbacks<Cursor>  {
 
 	private boolean mIsBound;
-	private ArrayList<Message> messages;
 	private ImageView mStateIcon;
 	private ListView lv;
+	private MessagesAdapter mAdapter;
 	private MinutisService mService;
 	private TextView mStateText;
 
@@ -57,7 +61,9 @@ public class MinutisActivity extends AppCompatActivity {
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (MinutisService.STATE_UPDATED.equals(intent.getAction())) {
+			if (MinutisService.MESSAGE_RECEIVED.equals(intent.getAction())) {
+				getLoaderManager().restartLoader(0, null, MinutisActivity.this);
+			} else if (MinutisService.STATE_UPDATED.equals(intent.getAction())) {
 				updateState();
 			} else if (MinutisService.CONNECTION_SUCCESS.equals(intent.getAction())) {
 				setStatus(null);
@@ -80,12 +86,10 @@ public class MinutisActivity extends AppCompatActivity {
 		mStateText = (TextView) findViewById (R.id.state_value);
 		mStateIcon = (ImageView) findViewById (R.id.state_icon);
 
-		messages = new ArrayList<Message>();
-
 		lv = (ListView) findViewById(R.id.list_messages);
 		lv.setEmptyView(findViewById(R.id.empty_list));
-		MessagesAdapter adapter = new MessagesAdapter(this, messages);
-		lv.setAdapter(adapter);
+		mAdapter = new MessagesAdapter(this, R.layout.message, null, 0);
+		lv.setAdapter(mAdapter);
     }
 
 	@Override
@@ -99,12 +103,14 @@ public class MinutisActivity extends AppCompatActivity {
 		bm.registerReceiver(mReceiver, filter);
 
 		bindIfServiceRunning();
+		getLoaderManager().initLoader(0, null, this);
 	}
 
 	@Override
 	protected void onPause() {
 		LocalBroadcastManager bm = LocalBroadcastManager.getInstance(this);
 		bm.unregisterReceiver(mReceiver);
+		getLoaderManager().destroyLoader(0);
 		super.onPause();
 	}
 
@@ -278,7 +284,8 @@ public class MinutisActivity extends AppCompatActivity {
 
 	public void startNavigation(View v) {
 		int position = lv.getPositionForView(v);
-		String address = messages.get(position).address;
+		Cursor cursor = (Cursor) mAdapter.getItem(position);
+		String address = cursor.getString(4);
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setData(Uri.parse("geo:0,0?q=" + address));
 		if (intent.resolveActivity(getPackageManager()) != null) {
@@ -315,6 +322,33 @@ public class MinutisActivity extends AppCompatActivity {
 			Intent intent = new Intent(this, MinutisService.class);
 			bindService(intent, mConnection, 0);
 		}
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		return new CursorLoader(this, null, null, null, null, "date DESC") {
+			@Override
+			public Cursor loadInBackground() {
+				MessageDBHelper helper = new MessageDBHelper(MinutisActivity.this);
+				SQLiteDatabase db = helper.getReadableDatabase();
+				return db.query("messages", getProjection(), getSelection(),
+				                getSelectionArgs(), null, null, getSortOrder(), null );
+			}
+		};
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		if (data == null) {
+			return;
+		} else {
+			mAdapter.changeCursor(data);
+		}
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		mAdapter.changeCursor(null);
 	}
 
 	private ServiceConnection mConnection = new ServiceConnection() {
