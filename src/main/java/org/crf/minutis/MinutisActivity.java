@@ -140,9 +140,6 @@ public class MinutisActivity extends AppCompatActivity implements
 		case R.id.settings:
 			startSettings();
 			return true;
-        case R.id.lorem_ipsum:
-			addLoremIpsum();
-            return true;
         case R.id.gps_test:
 			if (mIsBound) {
 				mService.updateGPS();
@@ -293,10 +290,6 @@ public class MinutisActivity extends AppCompatActivity implements
 		} else {
 			showSnackbar(R.string.no_navigation_app);
 		}
-	}
-
-	private void addLoremIpsum() {
-		((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
 	}
 
 	private void showSnackbar(int res) {
