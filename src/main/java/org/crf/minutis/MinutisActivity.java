@@ -354,11 +354,7 @@ public class MinutisActivity extends AppCompatActivity implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		if (data == null) {
-			return;
-		} else {
-			mAdapter.changeCursor(data);
-		}
+		mAdapter.changeCursor(data);
 	}
 
 	@Override
