@@ -93,10 +93,10 @@ public class MinutisService extends Service {
 		int icon;
 		String text;
 		if (mState == null) {
-			icon = R.drawable.ic_person_pin_black_24dp;
+			icon = R.drawable.ic_person_pin_white_24dp;
 			text = "";
 		} else {
-			icon = mState.icon;
+			icon = mState.iconNotif;
 			text = getString(mState.text);
 		}
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
