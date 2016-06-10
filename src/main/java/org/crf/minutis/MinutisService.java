@@ -29,7 +29,7 @@ public class MinutisService extends Service {
 
 	public static final String CONNECTION_ERROR = "connection_error";
 	public static final String CONNECTION_SUCCESS = "connection_success";
-	public static final String MESSAGE_RECEIVED = "message_received";
+	public static final String MESSAGES_UPDATED = "messages_updated";
 	public static final String RADIO_CODE_UPDATED = "radio_code_updated";
 	public static final String STATE_UPDATED = "state_updated";
 
@@ -137,6 +137,27 @@ public class MinutisService extends Service {
 		ioSocket.emit("update", state);
 
 		return true;
+	}
+
+	public void sendMessage(String content) {
+		long date = System.currentTimeMillis();
+		ContentValues cv = new ContentValues();
+		cv.put("type", -1);
+		cv.put("date", date);
+		cv.put("content", content);
+
+		MessageDBHelper helper = new MessageDBHelper(MinutisService.this);
+		SQLiteDatabase db = helper.getWritableDatabase();
+		db.insert("messages", null, cv);
+		helper.close();
+
+		JSONObject message = new JSONObject();
+		try {
+			message.put("text", content);
+			message.put("time", date);
+		} catch(JSONException ex) {}
+		ioSocket.emit("message", message);
+		notifyChanges(MESSAGES_UPDATED);
 	}
 
 	public void updateGPS() {
@@ -277,7 +298,7 @@ public class MinutisService extends Service {
 				SQLiteDatabase db = helper.getWritableDatabase();
 				db.insert("messages", null, cv);
 				helper.close();
-				notifyChanges(MESSAGE_RECEIVED);
+				notifyChanges(MESSAGES_UPDATED);
 			} catch(JSONException ex) {}
 		}
 	};

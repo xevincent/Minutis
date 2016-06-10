@@ -55,6 +55,9 @@ public class MessagesAdapter extends ResourceCursorAdapter {
 		case 1:
 			icon = R.drawable.ic_group_black_24dp;
 			break;
+		case -1:
+			icon = R.drawable.ic_send_black_24dp;
+			break;
 		default:
 			// Should never happen
 			icon = R.drawable.ic_message_black_24dp;

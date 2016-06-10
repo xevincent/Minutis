@@ -61,7 +61,7 @@ public class MinutisActivity extends AppCompatActivity implements
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (MinutisService.MESSAGE_RECEIVED.equals(intent.getAction())) {
+			if (MinutisService.MESSAGES_UPDATED.equals(intent.getAction())) {
 				getLoaderManager().restartLoader(0, null, MinutisActivity.this);
 			} else if (MinutisService.STATE_UPDATED.equals(intent.getAction())) {
 				updateState();
@@ -93,17 +93,19 @@ public class MinutisActivity extends AppCompatActivity implements
     }
 
 	@Override
-	protected void onStart() {
-		super.onStart();
+	protected void onResume() {
+		super.onResume();
+		getLoaderManager().initLoader(0, null, this);
+		bindIfServiceRunning();
+
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(MinutisService.CONNECTION_ERROR);
 		filter.addAction(MinutisService.CONNECTION_SUCCESS);
 		filter.addAction(MinutisService.STATE_UPDATED);
+		filter.addAction(MinutisService.MESSAGES_UPDATED);
 		LocalBroadcastManager bm = LocalBroadcastManager.getInstance(this);
 		bm.registerReceiver(mReceiver, filter);
 
-		bindIfServiceRunning();
-		getLoaderManager().initLoader(0, null, this);
 	}
 
 	@Override
@@ -111,16 +113,11 @@ public class MinutisActivity extends AppCompatActivity implements
 		LocalBroadcastManager bm = LocalBroadcastManager.getInstance(this);
 		bm.unregisterReceiver(mReceiver);
 		getLoaderManager().destroyLoader(0);
-		super.onPause();
-	}
-
-	@Override
-	protected void onStop() {
 		if (mIsBound) {
 			unbindService(mConnection);
 			mIsBound = false;
 		}
-		super.onStop();
+		super.onPause();
 	}
 
 	@Override
@@ -134,6 +131,9 @@ public class MinutisActivity extends AppCompatActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
+		case R.id.write:
+			sendMessage();
+			return true;
         case R.id.connect:
 			showConnect();
             return true;
@@ -245,7 +245,7 @@ public class MinutisActivity extends AppCompatActivity implements
 
 	public void setStatus(View v) {
 		if (!mIsBound) {
-			showSnackbar(R.string.error_connect_first);
+			showSnackbar(R.string.error_connect_first_status);
 			return;
 		}
 		int currentStateCode = -1;
@@ -264,6 +264,28 @@ public class MinutisActivity extends AppCompatActivity implements
 		    	}
 		    });
 		builder.create().show();
+	}
+
+	private void sendMessage() {
+		if (!mIsBound) {
+			showSnackbar(R.string.error_connect_first_message);
+			return;
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.dialog_write_message_title)
+		    .setView(getLayoutInflater().inflate(R.layout.dialog_write_message, null))
+		    .setPositiveButton(R.string.all_send, new DialogInterface.OnClickListener() {
+		    	public void onClick(DialogInterface dialog, int id) {
+		    		EditText et = (EditText) ((AlertDialog) dialog).findViewById(R.id.message_written);
+		    		String message = et.getText().toString();
+		    		mService.sendMessage(message);
+		    	}
+		    })
+		    .setNegativeButton(R.string.all_cancel, null);
+		AlertDialog dialog = builder.create();
+		dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		dialog.show();
 	}
 
 	public void updateState() {
