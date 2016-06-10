@@ -43,6 +43,6 @@
   <string name="error_connect_first_status">"Connectez-vous pour changer d'état"</string>
   <string name="error_connect_first_message">Connectez-vous pour envoyer un message</string>
 
-  <string name="crash_toast_text">Un  rapport de crash va  être envoyé par mail</string>
+  <string  name="crash_dialog_text">"Minutis s'est arrêtée suite à une erreur imprévue.\n\nAidez-nous à corriger cette erreur en acceptant d'envoyer un rapport par email.\n\nAucune donnée personnelle ne sera transmise."</string>
 
 </resources>

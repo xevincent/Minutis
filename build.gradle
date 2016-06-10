@@ -19,12 +19,13 @@ android {
 	minSdkVersion 15
 	targetSdkVersion 23
 	buildConfigField "String", "MINUTIS_URL", project.MINUTIS_URL
+	buildConfigField "String", "ACRA_EMAIL", project.ACRA_EMAIL
   }
 
   dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
 	compile 'com.android.support:design:23.2.1'
-	compile('ch.acra:acra:4.8.5') {
+	compile('ch.acra:acra:4.9.0') {
 		exclude group: 'org.json'
 	}
 	compile('io.socket:socket.io-client:0.7.0') {
