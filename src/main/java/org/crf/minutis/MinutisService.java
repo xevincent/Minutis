@@ -4,14 +4,25 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.Manifest.permission;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.HandlerThread;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import java.net.URISyntaxException;
@@ -29,11 +40,14 @@ public class MinutisService extends Service {
 
 	public static final String CONNECTION_ERROR = "connection_error";
 	public static final String CONNECTION_SUCCESS = "connection_success";
+	public static final String GPS_DISABLED = "gps_disabled";
 	public static final String MESSAGES_UPDATED = "messages_updated";
 	public static final String RADIO_CODE_UPDATED = "radio_code_updated";
 	public static final String STATE_UPDATED = "state_updated";
 
 	private final IBinder mBinder = new LocalBinder();
+	private HandlerThread mHandlerThread;
+	private LocationManager mLocationManager;
 	private Socket ioSocket;
 	private State mState;
 	private String mRadioCode = "";
@@ -43,6 +57,28 @@ public class MinutisService extends Service {
 			return MinutisService.this;
 		}
 	}
+
+	LocationListener mLocationListener = new LocationListener() {
+		public void onLocationChanged(Location location) {
+			if (!ioSocket.connected()) {
+				return;
+			}
+			JSONObject position = new JSONObject();
+			JSONObject data = new JSONObject();
+			try {
+				position.put("lat", location.getLatitude());
+				position.put("lng", location.getLongitude());
+				data.put("position", position);
+			} catch(JSONException ex) {}
+			ioSocket.emit("update", data);
+		}
+
+		public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+		public void onProviderEnabled(String provider) {}
+
+		public void onProviderDisabled(String provider) {}
+	};
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -70,11 +106,17 @@ public class MinutisService extends Service {
 
 		ioSocket.connect();
 
+		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
 		return START_STICKY;
 	}
 
 	@Override
 	public void onDestroy() {
+		mLocationManager.removeUpdates(mLocationListener);
+		if (mHandlerThread != null) {
+			mHandlerThread.quit();
+		}
 		stopForeground(true);
 		ioSocket.off(Socket.EVENT_CONNECT, onConnect);
 		ioSocket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
@@ -112,6 +154,33 @@ public class MinutisService extends Service {
 
 		mBuilder.setContentIntent(pIntent);
 		startForeground(314159, mBuilder.build());
+	}
+
+	private void startLocation() {
+		if (ContextCompat.checkSelfPermission(this,
+		    permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+		    && ContextCompat.checkSelfPermission(this,
+		    permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			return;
+		}
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		if (!sp.getBoolean("enable_gps", true)) {
+			return;
+		}
+		int mode = Settings.Secure.getInt(getContentResolver(),
+		    Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
+		if (mode == Settings.Secure.LOCATION_MODE_OFF) {
+			notifyChanges(GPS_DISABLED);
+		}
+		mLocationManager.removeUpdates(mLocationListener);
+		long minTime = mState == null ? 6000L : mState.locationUpdateInterval;
+		if (mHandlerThread == null) {
+			mHandlerThread = new HandlerThread("MyLocationHandlerThread");
+			mHandlerThread.start();
+		}
+
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+		    minTime, 0, mLocationListener, mHandlerThread.getLooper());
 	}
 
 	public boolean isConnected() {
@@ -224,7 +293,7 @@ public class MinutisService extends Service {
 	private Emitter.Listener onDisconnect = new Emitter.Listener() {
 		@Override
 		public void call(Object... args) {
-			// TODO
+			mLocationManager.removeUpdates(mLocationListener);
 		}
 	};
 
@@ -238,6 +307,7 @@ public class MinutisService extends Service {
 				phone.put("phone", sp.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));
 			} catch(JSONException ex) {}
 			ioSocket.emit("register", phone);
+			startLocation();
 			// TODO send unsend messages
 		}
 	};
@@ -264,6 +334,7 @@ public class MinutisService extends Service {
 					if (state.code == newStateCode) {
 						mState = state;
 						notifyChanges(STATE_UPDATED);
+						startLocation();
 						break;
 					}
 				}

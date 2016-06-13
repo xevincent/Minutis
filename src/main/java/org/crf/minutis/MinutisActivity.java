@@ -13,13 +13,18 @@ import android.content.IntentFilter;
 import android.content.Loader;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.Manifest.permission;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -61,17 +66,28 @@ public class MinutisActivity extends AppCompatActivity implements
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (MinutisService.MESSAGES_UPDATED.equals(intent.getAction())) {
+			String action = intent.getAction();
+			switch(action) {
+			case MinutisService.MESSAGES_UPDATED:
 				getLoaderManager().restartLoader(0, null, MinutisActivity.this);
-			} else if (MinutisService.STATE_UPDATED.equals(intent.getAction())) {
+				break;
+			case MinutisService.STATE_UPDATED:
 				updateState();
-			} else if (MinutisService.CONNECTION_SUCCESS.equals(intent.getAction())) {
+				break;
+			case MinutisService.CONNECTION_SUCCESS:
 				setStatus(null);
-			} else if (MinutisService.CONNECTION_ERROR.equals(intent.getAction())) {
+				break;
+			case MinutisService.CONNECTION_ERROR:
 				showSnackbar(R.string.error_cannot_connect);
 				disconnect();
-			} else if (MinutisService.RADIO_CODE_UPDATED.equals(intent.getAction())) {
+				break;
+			case MinutisService.RADIO_CODE_UPDATED:
 				updateRadioCode();
+				break;
+			case MinutisService.GPS_DISABLED:
+				enableGPS(true);
+				break;
+			default:
 			}
 		}
 	};
@@ -90,6 +106,15 @@ public class MinutisActivity extends AppCompatActivity implements
 		lv.setEmptyView(findViewById(R.id.empty_list));
 		mAdapter = new MessagesAdapter(this, R.layout.message, null, 0);
 		lv.setAdapter(mAdapter);
+
+		if (ContextCompat.checkSelfPermission(this,
+		    permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+		    || ContextCompat.checkSelfPermission(this,
+		    permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+		    ActivityCompat.requestPermissions(this, new String[] {
+			    permission.ACCESS_COARSE_LOCATION,
+			    permission.ACCESS_FINE_LOCATION }, 0);
+		}
     }
 
 	@Override
@@ -103,6 +128,7 @@ public class MinutisActivity extends AppCompatActivity implements
 		filter.addAction(MinutisService.CONNECTION_SUCCESS);
 		filter.addAction(MinutisService.STATE_UPDATED);
 		filter.addAction(MinutisService.MESSAGES_UPDATED);
+		filter.addAction(MinutisService.GPS_DISABLED);
 		LocalBroadcastManager bm = LocalBroadcastManager.getInstance(this);
 		bm.registerReceiver(mReceiver, filter);
 
@@ -236,6 +262,12 @@ public class MinutisActivity extends AppCompatActivity implements
 		mStateIcon.setImageResource(R.drawable.ic_person_pin_black_24dp);
 		TextView radioCode = (TextView) findViewById (R.id.radio_code_value);
 		radioCode.setText("");
+
+		int mode = Settings.Secure.getInt(getContentResolver(),
+		    Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
+		if (mode != Settings.Secure.LOCATION_MODE_OFF) {
+			enableGPS(false);
+		}
 	}
 
 	private void startSettings() {
@@ -312,6 +344,24 @@ public class MinutisActivity extends AppCompatActivity implements
 		} else {
 			showSnackbar(R.string.no_navigation_app);
 		}
+	}
+
+	private void enableGPS(boolean enable) {
+		int title = enable ? R.string.dialog_enable_gps_title :
+			R.string.dialog_disable_gps_title;
+		int message = enable ? R.string.dialog_enable_gps_message :
+			R.string.dialog_disable_gps_message;
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(title)
+		    .setMessage(message)
+		    .setPositiveButton(R.string.all_yes, new DialogInterface.OnClickListener() {
+		    	public void onClick(DialogInterface dialog, int id) {
+		    		Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+		    		startActivity(intent);
+		    	}
+		    })
+		    .setNegativeButton(R.string.all_cancel, null);
+		builder.create().show();
 	}
 
 	private void showSnackbar(int res) {
