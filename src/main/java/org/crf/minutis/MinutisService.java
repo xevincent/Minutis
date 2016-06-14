@@ -44,6 +44,7 @@ public class MinutisService extends Service {
 	public static final String STATE_UPDATED = "state_updated";
 
 	private final IBinder mBinder = new LocalBinder();
+	private boolean mMinutisRequestedGpsActivation;
 	private HandlerThread mHandlerThread;
 	private LocationManager mLocationManager;
 	private Socket ioSocket;
@@ -169,6 +170,7 @@ public class MinutisService extends Service {
 		    Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
 		if (mode == Settings.Secure.LOCATION_MODE_OFF) {
 			notifyChanges(GPS_DISABLED);
+			mMinutisRequestedGpsActivation = true;
 		}
 		mLocationManager.removeUpdates(mLocationListener);
 		long minTime = mState == null ? 6000L : mState.locationUpdateInterval;
@@ -225,6 +227,10 @@ public class MinutisService extends Service {
 		} catch(JSONException ex) {}
 		ioSocket.emit("message", message);
 		notifyChanges(MESSAGES_UPDATED);
+	}
+
+	public boolean minutisRequestedGpsActivation() {
+		return mMinutisRequestedGpsActivation;
 	}
 
 	private void notifyChanges (String action) {

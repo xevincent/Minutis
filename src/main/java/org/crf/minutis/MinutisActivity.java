@@ -251,16 +251,18 @@ public class MinutisActivity extends AppCompatActivity implements
 	}
 
 	private void disconnect() {
+		int mode = Settings.Secure.getInt(getContentResolver(),
+		    Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
+		boolean showGPSDialog = mode != Settings.Secure.LOCATION_MODE_OFF &&
+		    mService.minutisRequestedGpsActivation();
+
 		Intent service = new Intent(this, MinutisService.class);
 		stopService(service);
 		mStateText.setText(R.string.state_undefined);
 		mStateIcon.setImageResource(R.drawable.ic_person_pin_black_24dp);
 		TextView radioCode = (TextView) findViewById (R.id.radio_code_value);
 		radioCode.setText("");
-
-		int mode = Settings.Secure.getInt(getContentResolver(),
-		    Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
-		if (mode != Settings.Secure.LOCATION_MODE_OFF) {
+		if (showGPSDialog) {
 			enableGPS(false);
 		}
 	}
