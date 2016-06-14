@@ -24,7 +24,7 @@ public class MessagesAdapter extends ResourceCursorAdapter {
 
 	public MessagesAdapter(Context context, int layout, Cursor c, int flags) {
 		super(context, layout, c, flags);
-		sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+		sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	}
 
 	@Override
