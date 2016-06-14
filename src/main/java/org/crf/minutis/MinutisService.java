@@ -26,8 +26,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import java.net.URISyntaxException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import io.socket.client.IO;
 import io.socket.client.Socket ;
@@ -227,37 +225,6 @@ public class MinutisService extends Service {
 		} catch(JSONException ex) {}
 		ioSocket.emit("message", message);
 		notifyChanges(MESSAGES_UPDATED);
-	}
-
-	public void updateGPS() {
-		String[] lat = {
-			"48.85894393201113",
-			"48.858322765835325",
-			"48.86193671554044",
-			"48.87322862657411"
-		};
-		String[] lng = {
-			"2.2931814193725586",
-			"2.312922477722168",
-			"2.334723472595215",
-			"2.2953271865844727"
-		};
-		for (int index = 0; index < lat.length; index++) {
-			final JSONObject position = new JSONObject();
-			JSONObject gps = new JSONObject();
-			try {
-				gps.put("lat", lat[index]);
-				gps.put("lng", lng[index]);
-				position.put("position", gps);
-			} catch(JSONException ex) {}
-			new Timer().schedule(new TimerTask() {
-					@Override
-					public void run() {
-						// this code will be executed after 2 seconds
-						ioSocket.emit("update", position);
-					}
-				}, index * 3000);
-		}
 	}
 
 	private void notifyChanges (String action) {

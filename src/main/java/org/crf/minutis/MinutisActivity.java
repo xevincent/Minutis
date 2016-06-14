@@ -166,11 +166,6 @@ public class MinutisActivity extends AppCompatActivity implements
 		case R.id.settings:
 			startSettings();
 			return true;
-        case R.id.gps_test:
-			if (mIsBound) {
-				mService.updateGPS();
-			}
-            return true;
         default:
             return super.onOptionsItemSelected(item);
 		}
