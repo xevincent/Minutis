@@ -7,4 +7,4 @@
     android:layout_width="match_parent"
     android:elevation="4dp"
     android:background="@color/primary"
-    android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
+    android:theme="@style/ToolBarStyle" />

@@ -37,7 +37,9 @@ import org.json.JSONObject;
 
 public class MinutisService extends Service {
 
+	public static final String CONNECTION_DISCONNECT = "connection_disconnect";
 	public static final String CONNECTION_ERROR = "connection_error";
+	public static final String CONNECTION_RECONNECT = "connection_reconnect";
 	public static final String CONNECTION_SUCCESS = "connection_success";
 	public static final String GPS_DISABLED = "gps_disabled";
 	public static final String MESSAGES_UPDATED = "messages_updated";
@@ -312,6 +314,7 @@ public class MinutisService extends Service {
 	private Emitter.Listener onDisconnect = new Emitter.Listener() {
 		@Override
 		public void call(Object... args) {
+			notifyChanges(CONNECTION_DISCONNECT);
 			mLocationManager.removeUpdates(mLocationListener);
 		}
 	};
@@ -319,6 +322,7 @@ public class MinutisService extends Service {
 	private Emitter.Listener onReconnect = new Emitter.Listener() {
 		@Override
 		public void call(Object... args) {
+			notifyChanges(CONNECTION_RECONNECT);
 			JSONObject phone = new JSONObject();
 			try {
 				phone.put("phone", mPrefs.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));

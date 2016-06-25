@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">Minutis</string>
+  <string name="app_connected">Connecté</string>
+  <string name="app_disconnected">Déconnecté</string>
   <string name="settings_name">Paramètres</string>
   <string name="all_connection">Connexion</string>
   <string name="all_write_message">Écrire un message</string>

@@ -61,6 +61,7 @@ public class MinutisActivity extends AppCompatActivity implements
 	private MessagesAdapter mAdapter;
 	private MinutisService mService;
 	private TextView mStateText;
+	private Toolbar mToolbar;
 
 
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -75,11 +76,18 @@ public class MinutisActivity extends AppCompatActivity implements
 				updateState();
 				break;
 			case MinutisService.CONNECTION_SUCCESS:
+				mToolbar.setSubtitle(R.string.app_connected);
 				setStatus(null);
 				break;
 			case MinutisService.CONNECTION_ERROR:
 				showSnackbar(R.string.error_cannot_connect);
 				disconnect();
+				break;
+			case MinutisService.CONNECTION_DISCONNECT:
+				mToolbar.setSubtitle(R.string.app_disconnected);
+				break;
+			case MinutisService.CONNECTION_RECONNECT:
+				mToolbar.setSubtitle(R.string.app_connected);
 				break;
 			case MinutisService.RADIO_CODE_UPDATED:
 				updateRadioCode();
@@ -96,8 +104,9 @@ public class MinutisActivity extends AppCompatActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
+		mToolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(mToolbar);
+		mToolbar.setSubtitle(R.string.app_disconnected);
 
 		mStateText = (TextView) findViewById (R.id.state_value);
 		mStateIcon = (ImageView) findViewById (R.id.state_icon);
@@ -251,6 +260,7 @@ public class MinutisActivity extends AppCompatActivity implements
 	}
 
 	private void disconnect() {
+		mToolbar.setSubtitle(R.string.app_disconnected);
 		int mode = Settings.Secure.getInt(getContentResolver(),
 		    Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
 		boolean showGPSDialog = mode != Settings.Secure.LOCATION_MODE_OFF &&
