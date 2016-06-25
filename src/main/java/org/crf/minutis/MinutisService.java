@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -44,7 +45,9 @@ public class MinutisService extends Service {
 	public static final String STATE_UPDATED = "state_updated";
 
 	private final IBinder mBinder = new LocalBinder();
+	private boolean mIsActivityVisible;
 	private boolean mMinutisRequestedGpsActivation;
+	private int mUnreadMessages;
 	private HandlerThread mHandlerThread;
 	private LocationManager mLocationManager;
 	private SharedPreferences mPrefs;
@@ -86,7 +89,20 @@ public class MinutisService extends Service {
 	}
 
 	@Override
+	public void onRebind (Intent intent) {
+		mIsActivityVisible = true;
+		startForeground();
+	}
+
+	@Override
+	public boolean onUnbind (Intent intent) {
+		mIsActivityVisible = false;
+		return true;
+	}
+
+	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		mIsActivityVisible = true;
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String url = mPrefs.getString(SettingsFragment.KEY_SERVER_ADDRESS, "").trim();
 		if (url.isEmpty()) {
@@ -138,31 +154,47 @@ public class MinutisService extends Service {
 
 	private void startForeground(boolean notifyNewMessage) {
 		int icon;
-		String text;
+		int title;
+		Resources res = getResources();
+		String unreadMessages;
+
+		if (mIsActivityVisible) {
+			mUnreadMessages = 0;
+			unreadMessages = getString(R.string.no_message);
+		} else {
+			unreadMessages = res.getQuantityString(R.plurals.new_message,
+			                                       mUnreadMessages, mUnreadMessages);
+		}
+
 		if (mState == null) {
 			icon = R.drawable.ic_person_pin_white_24dp;
-			text = "";
+			title = R.string.app_name;
 		} else {
-			icon = mState.iconNotif;
-			text = getString(mState.text);
+			icon = mUnreadMessages == 0 ? mState.iconNotif : R.drawable.ic_message_white_24dp;
+			title = mState.text;
 		}
+
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-		    .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_logo))
+		    .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.ic_logo))
 		    .setSmallIcon(icon)
-		    .setContentTitle(getString(R.string.app_name))
-		    .setContentText(text);
+		    .setContentTitle(getString(title))
+		    .setContentText(unreadMessages)
+		    .setCategory(Notification.CATEGORY_MESSAGE);
 
 		if (notifyNewMessage) {
 			boolean buzzer = mPrefs.getBoolean("notif_buzzer", true);
 			boolean sound = mPrefs.getBoolean("notif_sound", true);
 			if (buzzer && sound) {
-				builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+				builder.setDefaults(Notification.DEFAULT_ALL);
 			} else if (buzzer) {
-				builder.setDefaults(Notification.DEFAULT_VIBRATE);
+				builder.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
 			} else if (sound) {
-				builder.setDefaults(Notification.DEFAULT_SOUND);
+				builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS);
+			} else {
+				builder.setDefaults(Notification.DEFAULT_LIGHTS);
 			}
 		}
+
 		Intent intent = new Intent(this, MinutisActivity.class);
 		PendingIntent pIntent =
 		    PendingIntent.getActivity(this, 0, intent,
@@ -354,6 +386,7 @@ public class MinutisService extends Service {
 				SQLiteDatabase db = helper.getWritableDatabase();
 				db.insert("messages", null, cv);
 				helper.close();
+				mUnreadMessages++;
 				notifyChanges(MESSAGES_UPDATED);
 				startForeground(true);
 			} catch(JSONException ex) {}

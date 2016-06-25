@@ -24,6 +24,10 @@
   <string name="state_home">Rentré</string>
   <string name="main_messages">Messages</string>
   <string name="no_message">Aucun message reçu</string>
+  <plurals name="new_message">
+    <item quantity="one">%d message reçu</item>
+    <item quantity="other">%d messages reçus</item>
+  </plurals>
   <string name="main_select_state">Choisissez votre statut</string>
   <string name="no_navigation_app">Aucune application de géolocalisation trouvée</string>
   <string name="dialog_phone_number_title">Veuillez entrer votre numéro de téléphone</string>
