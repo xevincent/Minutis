@@ -112,6 +112,7 @@ public class MinutisService extends Service {
 
 	@Override
 	public void onDestroy() {
+		ioSocket.emit("unregister", new JSONObject());
 		mLocationManager.removeUpdates(mLocationListener);
 		if (mHandlerThread != null) {
 			mHandlerThread.quit();
