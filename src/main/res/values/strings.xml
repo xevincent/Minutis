@@ -42,6 +42,8 @@
   <string name="pref_notification">Notification</string>
   <string name="pref_notif_buzzer_summary">"Vibrer à la réception d'un message"</string>
   <string name="pref_notif_buzzer_title">Activer le vibreur</string>
+  <string name="pref_notif_sound_summary">"Émettre un son à la réception d'un message"</string>
+  <string name="pref_notif_sound_title">Activer la notification sonore</string>
   <string name="error_cannot_connect">Impossible de se connecter</string>
   <string name="error_cannot_connect_without_phone">Impossible de se connecter sans numéro de téléphone</string>
   <string    name="error_connect_first_status">Connectez-vous pour changer de statut</string>

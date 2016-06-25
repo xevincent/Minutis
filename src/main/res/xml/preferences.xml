@@ -6,6 +6,11 @@
 		android:summary="@string/pref_notif_buzzer_summary"
 		android:title="@string/pref_notif_buzzer_title"
 		android:defaultValue="true" />
+	<SwitchPreference
+		android:key="notif_sound"
+		android:summary="@string/pref_notif_sound_summary"
+		android:title="@string/pref_notif_sound_title"
+		android:defaultValue="true" />
   </PreferenceCategory>
 
   <PreferenceCategory android:title="@string/pref_privacy" >

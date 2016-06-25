@@ -47,6 +47,7 @@ public class MinutisService extends Service {
 	private boolean mMinutisRequestedGpsActivation;
 	private HandlerThread mHandlerThread;
 	private LocationManager mLocationManager;
+	private SharedPreferences mPrefs;
 	private Socket ioSocket;
 	private State mState;
 	private String mRadioCode = "";
@@ -86,8 +87,8 @@ public class MinutisService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		String url = sp.getString(SettingsFragment.KEY_SERVER_ADDRESS, "").trim();
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String url = mPrefs.getString(SettingsFragment.KEY_SERVER_ADDRESS, "").trim();
 		if (url.isEmpty()) {
 			url = BuildConfig.MINUTIS_URL;
 		}
@@ -132,6 +133,10 @@ public class MinutisService extends Service {
 	}
 
 	private void startForeground() {
+		startForeground(false);
+	}
+
+	private void startForeground(boolean notifyNewMessage) {
 		int icon;
 		String text;
 		if (mState == null) {
@@ -141,19 +146,30 @@ public class MinutisService extends Service {
 			icon = mState.iconNotif;
 			text = getString(mState.text);
 		}
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
 		    .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_logo))
 		    .setSmallIcon(icon)
 		    .setContentTitle(getString(R.string.app_name))
 		    .setContentText(text);
 
+		if (notifyNewMessage) {
+			boolean buzzer = mPrefs.getBoolean("notif_buzzer", true);
+			boolean sound = mPrefs.getBoolean("notif_sound", true);
+			if (buzzer && sound) {
+				builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+			} else if (buzzer) {
+				builder.setDefaults(Notification.DEFAULT_VIBRATE);
+			} else if (sound) {
+				builder.setDefaults(Notification.DEFAULT_SOUND);
+			}
+		}
 		Intent intent = new Intent(this, MinutisActivity.class);
 		PendingIntent pIntent =
 		    PendingIntent.getActivity(this, 0, intent,
 		                              PendingIntent.FLAG_UPDATE_CURRENT);
 
-		mBuilder.setContentIntent(pIntent);
-		startForeground(314159, mBuilder.build());
+		builder.setContentIntent(pIntent);
+		startForeground(314159, builder.build());
 	}
 
 	private void startLocation() {
@@ -163,8 +179,7 @@ public class MinutisService extends Service {
 		    permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 			return;
 		}
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		if (!sp.getBoolean("enable_gps", true)) {
+		if (!mPrefs.getBoolean("enable_gps", true)) {
 			return;
 		}
 		int mode = Settings.Secure.getInt(getContentResolver(),
@@ -242,11 +257,9 @@ public class MinutisService extends Service {
 	private Emitter.Listener onConnect = new Emitter.Listener() {
 			@Override
 			public void call(Object... args) {
-				SharedPreferences sp =
-				    PreferenceManager.getDefaultSharedPreferences(MinutisService.this);
 				JSONObject phone = new JSONObject();
 				try {
-					phone.put("phone", sp.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));
+					phone.put("phone", mPrefs.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));
 				} catch(JSONException ex) {}
 				ioSocket.emit("register", phone);
 				startForeground();
@@ -274,11 +287,9 @@ public class MinutisService extends Service {
 	private Emitter.Listener onReconnect = new Emitter.Listener() {
 		@Override
 		public void call(Object... args) {
-			SharedPreferences sp =
-			    PreferenceManager.getDefaultSharedPreferences(MinutisService.this);
 			JSONObject phone = new JSONObject();
 			try {
-				phone.put("phone", sp.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));
+				phone.put("phone", mPrefs.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));
 			} catch(JSONException ex) {}
 			ioSocket.emit("register", phone);
 			startLocation();
@@ -344,6 +355,7 @@ public class MinutisService extends Service {
 				db.insert("messages", null, cv);
 				helper.close();
 				notifyChanges(MESSAGES_UPDATED);
+				startForeground(true);
 			} catch(JSONException ex) {}
 		}
 	};
