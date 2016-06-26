@@ -184,17 +184,14 @@ public class MinutisService extends Service {
 		    .setCategory(Notification.CATEGORY_MESSAGE);
 
 		if (notifyNewMessage) {
-			boolean buzzer = mPrefs.getBoolean("notif_buzzer", true);
-			boolean sound = mPrefs.getBoolean("notif_sound", true);
-			if (buzzer && sound) {
-				builder.setDefaults(Notification.DEFAULT_ALL);
-			} else if (buzzer) {
-				builder.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
-			} else if (sound) {
-				builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS);
-			} else {
-				builder.setDefaults(Notification.DEFAULT_LIGHTS);
+			int defaults = Notification.DEFAULT_LIGHTS;
+			if (mPrefs.getBoolean("notif_buzzer", true)) {
+				defaults |= Notification.DEFAULT_VIBRATE;
 			}
+			if (mPrefs.getBoolean("notif_sound", true)) {
+				defaults |= Notification.DEFAULT_SOUND;
+			}
+			builder.setDefaults(defaults);
 		}
 
 		Intent intent = new Intent(this, MinutisActivity.class);
