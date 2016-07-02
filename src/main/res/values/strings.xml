@@ -45,7 +45,7 @@
   <string name="pref_reset_server_address">"Réinitialiser l'adresse du serveur"</string>
   <string name="pref_privacy">Confidentialité</string>
   <string name="pref_gps_title">Activer le GPS</string>
-  <string name="pref_gps_summary">Envoie la position du téléphone au serveur</string>
+  <string name="pref_gps_summary">Envoyer la position du téléphone au serveur</string>
   <string name="pref_notification">Notification</string>
   <string name="pref_notif_buzzer_summary">"Vibrer à la réception d'un message"</string>
   <string name="pref_notif_buzzer_title">Activer le vibreur</string>
