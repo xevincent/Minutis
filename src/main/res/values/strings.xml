@@ -40,6 +40,7 @@
   <string name="dialog_disable_gps_message">"L'extinction se fait dans l'application Paramètres.\nEn cliquant sur oui, vous serez directement sur la bonne fenêtre pour éteindre le GPS"</string>
   <string name="pref_phone_number">Numéro de téléphone</string>
   <string name="pref_server_address">Adresse du serveur</string>
+  <string name="pref_server_address_malformed">"L'adresse entrée est invalide"</string>
   <string name="pref_default_server_address">Adresse du serveur par défaut</string>
   <string name="pref_reset_server_address">"Réinitialiser l'adresse du serveur"</string>
   <string name="pref_privacy">Confidentialité</string>

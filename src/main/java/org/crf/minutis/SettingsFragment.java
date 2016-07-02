@@ -15,6 +15,9 @@ import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class SettingsFragment extends PreferenceFragment
     implements OnSharedPreferenceChangeListener {
 
@@ -76,7 +79,15 @@ public class SettingsFragment extends PreferenceFragment
             Preference pref = findPreference(KEY_SERVER_ADDRESS);
 			String serverAddress = sp.getString(key, "").trim();
 			if (serverAddress.isEmpty()) {
+				sp.edit().remove(KEY_SERVER_ADDRESS).apply();
 				serverAddress = getString(R.string.pref_default_server_address);
+			} else  {
+				try {
+					new URL(serverAddress);
+				} catch (MalformedURLException ex) {
+					sp.edit().remove(KEY_SERVER_ADDRESS).apply();
+					serverAddress = getString(R.string.pref_server_address_malformed);
+				}
 			}
 			pref.setSummary(serverAddress);
 		}
