@@ -294,7 +294,8 @@ public class MinutisActivity extends AppCompatActivity implements
 		}
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.main_select_state)
-		    .setCancelable(currentStateCode != -1)
+		    .setCancelable(true)
+		    .setNegativeButton(R.string.all_cancel, null)
 		    .setAdapter(new StateAdapter(this, currentStateCode),
 		                new DialogInterface.OnClickListener() {
 		    	public void onClick(DialogInterface dialog, int which) {
