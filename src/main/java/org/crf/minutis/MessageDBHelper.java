@@ -9,7 +9,7 @@ import java.lang.StringBuilder;
 
 public class MessageDBHelper extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	private static final String DATABASE_NAME = "minutis.db";
 
 	public MessageDBHelper(Context context) {
@@ -25,14 +25,22 @@ public class MessageDBHelper extends SQLiteOpenHelper {
 		    .append("type INTEGER,")
 		    .append("date LONG,")
 		    .append("content TEXT,")
-		    .append("address TEXT DEFAULT ''")
+		    .append("address TEXT DEFAULT '',")
+		    .append("uuid TEXT,")
+		    .append("ack INTEGER DEFAULT 0")
 		    .append(");");
 		db.execSQL(builder.toString());
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		db.execSQL("DROP TABLE IF EXISTS messages");
-		onCreate(db);
+		switch(oldVersion) {
+		case 1:
+			db.execSQL("ALTER TABLE messages ADD COLUMN uuid TEXT;");
+			db.execSQL("ALTER TABLE messages ADD COLUMN ack INTEGER DEFAULT 0;");
+			//and so on.. do not add breaks so that switch will
+			//start at oldVersion, and run straight through to the latest
+			// case 2:
+		}
 	}
 }
