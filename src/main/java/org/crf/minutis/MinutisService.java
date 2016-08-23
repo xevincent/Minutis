@@ -394,6 +394,12 @@ public class MinutisService extends Service {
 				mUnreadMessages++;
 				notifyChanges(MESSAGES_UPDATED);
 				startForeground(true);
+
+				JSONObject message = new JSONObject();
+				try {
+					message.put("id", json.getString("id"));
+					ioSocket.emit("ackMessage", message);
+				} catch(JSONException ex) {}
 			} catch(JSONException ex) {}
 		}
 	};
