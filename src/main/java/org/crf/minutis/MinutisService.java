@@ -122,6 +122,7 @@ public class MinutisService extends Service {
 		ioSocket.on(Socket.EVENT_RECONNECT, onReconnect);
 		ioSocket.on("update", onUpdate);
 		ioSocket.on("message", onMessage);
+		ioSocket.on("ackMessage", onAckMessage);
 
 		ioSocket.connect();
 
@@ -145,6 +146,7 @@ public class MinutisService extends Service {
 		ioSocket.off(Socket.EVENT_RECONNECT, onReconnect);
 		ioSocket.off("update", onUpdate);
 		ioSocket.off("message", onMessage);
+		ioSocket.off("ackMessage", onAckMessage);
 		if(ioSocket.connected()) {
 			ioSocket.disconnect();
 		}
@@ -400,6 +402,23 @@ public class MinutisService extends Service {
 					message.put("id", json.getString("id"));
 					ioSocket.emit("ackMessage", message);
 				} catch(JSONException ex) {}
+			} catch(JSONException ex) {}
+		}
+	};
+
+	private Emitter.Listener onAckMessage = new Emitter.Listener() {
+		@Override
+		public void call(Object... args) {
+			JSONObject json = (JSONObject) args[0];
+			try {
+				String uuid = json.getString("id");
+				ContentValues cv = new ContentValues();
+				cv.put("ack", json.getInt("ack"));
+
+				MessageDBHelper helper = new MessageDBHelper(MinutisService.this);
+				SQLiteDatabase db = helper.getWritableDatabase();
+				db.update("messages", cv, "uuid=?", new String[] {uuid});
+				helper.close();
 			} catch(JSONException ex) {}
 		}
 	};
