@@ -27,6 +27,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import java.net.URISyntaxException;
+import java.util.UUID;
 
 import io.socket.client.IO;
 import io.socket.client.Socket ;
@@ -257,10 +258,12 @@ public class MinutisService extends Service {
 
 	public void sendMessage(String content) {
 		long date = System.currentTimeMillis();
+		String id = UUID.randomUUID().toString();
 		ContentValues cv = new ContentValues();
 		cv.put("type", -1);
 		cv.put("date", date);
 		cv.put("content", content);
+		cv.put("uuid", id);
 
 		MessageDBHelper helper = new MessageDBHelper(MinutisService.this);
 		SQLiteDatabase db = helper.getWritableDatabase();
@@ -271,6 +274,7 @@ public class MinutisService extends Service {
 		try {
 			message.put("text", content);
 			message.put("time", date);
+			message.put("id", id);
 		} catch(JSONException ex) {}
 		ioSocket.emit("message", message);
 		notifyChanges(MESSAGES_UPDATED);
