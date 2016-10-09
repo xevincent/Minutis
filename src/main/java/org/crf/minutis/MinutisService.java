@@ -297,6 +297,8 @@ public class MinutisService extends Service {
 				JSONObject phone = new JSONObject();
 				try {
 					phone.put("phone", mPrefs.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));
+					phone.put("version_name", BuildConfig.VERSION_NAME);
+					phone.put("version_code", BuildConfig.VERSION_CODE);
 				} catch(JSONException ex) {}
 				ioSocket.emit("register", phone);
 				startForeground();
