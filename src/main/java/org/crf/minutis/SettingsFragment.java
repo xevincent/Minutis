@@ -2,13 +2,19 @@ package org.crf.minutis;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.design.widget.Snackbar;
 import android.telephony.PhoneNumberUtils;
+import android.util.TypedValue;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
@@ -96,7 +102,11 @@ public class SettingsFragment extends PreferenceFragment
 	public boolean onPreferenceTreeClick (PreferenceScreen ps, Preference p) {
 		boolean ret;
 		if (KEY_RESET_SERVER_ADDRESS.equals(p.getKey())) {
-			mSharedPref.edit().remove(KEY_SERVER_ADDRESS).apply();
+			String address = mSharedPref.getString(KEY_SERVER_ADDRESS, "").trim();
+			if (!address.isEmpty()) {
+				mSharedPref.edit().remove(KEY_SERVER_ADDRESS).apply();
+				undoReset(address);
+			}
 			ret = true;
 		} else {
 			ret = false;
@@ -126,5 +136,20 @@ public class SettingsFragment extends PreferenceFragment
 			formatedNumber = getString(R.string.all_undefined);
 		}
 		return formatedNumber;
+	}
+
+	private void undoReset(final String address) {
+		Snackbar sb = Snackbar.make(getView(), R.string.pref_server_address_reset, Snackbar.LENGTH_LONG)
+		    .setAction(R.string.all_cancel, new View.OnClickListener() {
+		    	@Override
+		    	public void onClick(View v) {
+		    		mSharedPref.edit().putString(KEY_SERVER_ADDRESS, address).apply();
+		    	}
+		    });
+		int sbTextId = android.support.design.R.id.snackbar_text;
+		TextView tv = (TextView) sb.getView().findViewById(sbTextId);
+		tv.setTextColor(Color.WHITE);
+		tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		sb.show();
 	}
 }
