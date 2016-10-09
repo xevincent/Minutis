@@ -419,6 +419,7 @@ public class MinutisService extends Service {
 				SQLiteDatabase db = helper.getWritableDatabase();
 				db.update("messages", cv, "uuid=?", new String[] {uuid});
 				helper.close();
+				notifyChanges(MESSAGES_UPDATED);
 			} catch(JSONException ex) {}
 		}
 	};

@@ -14,6 +14,7 @@ import java.util.Date;
 public class MessagesAdapter extends ResourceCursorAdapter {
 
 	static class ViewHolder {
+		ImageView ack;
 		ImageView address;
 		ImageView type;
 		TextView date;
@@ -34,6 +35,7 @@ public class MessagesAdapter extends ResourceCursorAdapter {
 		ViewHolder holder = new ViewHolder();
 		holder.content = (TextView) view.findViewById(R.id.message_content);
 		holder.date = (TextView) view.findViewById(R.id.message_date);
+		holder.ack = (ImageView) view.findViewById(R.id.message_ack);
 		holder.address = (ImageView) view.findViewById(R.id.message_address);
 		holder.type = (ImageView) view.findViewById(R.id.message_image);
 		view.setTag(holder);
@@ -64,6 +66,19 @@ public class MessagesAdapter extends ResourceCursorAdapter {
 			break;
 		}
 		holder.type.setImageResource(icon);
+
+		int ack = cursor.getInt(6);
+		if (ack == 0) {
+			holder.ack.setVisibility(View.INVISIBLE);
+		} else {
+			holder.ack.setVisibility(View.VISIBLE);
+			if (ack == 1) {
+				holder.ack.setImageResource(R.drawable.ic_email_black_18dp);
+			} else {
+				holder.ack.setImageResource(R.drawable.ic_drafts_black_18dp);
+			}
+		}
+
 		if (cursor.getString(4).isEmpty()) {
 			holder.address.setVisibility(View.INVISIBLE);
 		} else {
