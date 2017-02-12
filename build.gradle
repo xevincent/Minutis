@@ -3,7 +3,7 @@ buildscript {
 	mavenCentral()
   }
   dependencies {
-	classpath 'com.android.tools.build:gradle:1.5.0'
+	classpath 'com.android.tools.build:gradle:2.2.3'
   }
 }
 apply plugin: 'com.android.application'
@@ -12,12 +12,12 @@ android {
   repositories {
 	mavenCentral()
   }
-  compileSdkVersion 23
-  buildToolsVersion '23.0.2'
+  compileSdkVersion 25
+  buildToolsVersion '25.0.2'
 
   defaultConfig {
 	minSdkVersion 15
-	targetSdkVersion 23
+	targetSdkVersion 25
 	buildConfigField "String", "MINUTIS_URL", project.MINUTIS_URL
 	buildConfigField "String", "ACRA_EMAIL", project.ACRA_EMAIL
   }
@@ -32,14 +32,14 @@ android {
 	}
 
 	dependencies {
-		compile 'com.android.support:appcompat-v7:23.4.0'
-		compile 'com.android.support:design:23.4.0'
-		compile('ch.acra:acra:4.9.0') {
+		compile 'com.android.support:appcompat-v7:25.1.1'
+		compile 'com.android.support:design:25.1.1'
+		compile('ch.acra:acra:4.9.2') {
 			exclude group: 'org.json'
 		}
-		compile('io.socket:socket.io-client:0.7.0') {
+		compile('io.socket:socket.io-client:0.8.3') {
 			exclude group: 'org.json', module: 'json'
 		}
-		compile 'com.googlecode.libphonenumber:libphonenumber:7.4.2'
+		compile 'com.googlecode.libphonenumber:libphonenumber:8.2.0'
 	}
 }
