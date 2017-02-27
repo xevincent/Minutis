@@ -18,6 +18,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.Manifest.permission;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -30,13 +31,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -282,6 +281,7 @@ public class MinutisActivity extends AppCompatActivity implements
 		startActivity(intent);
 	}
 
+	@SuppressWarnings({"WeakerAccess", "SameParameterValue", "UnusedParameters"})
 	public void setStatus(View v) {
 		if (!mIsBound) {
 			showSnackbar(R.string.error_connect_first_status);
@@ -328,7 +328,7 @@ public class MinutisActivity extends AppCompatActivity implements
 		dialog.show();
 	}
 
-	public void updateState() {
+	private void updateState() {
 		State state = mService.getState();
 		if (state != null) {
 			mStateText.setText(state.text);
@@ -336,7 +336,7 @@ public class MinutisActivity extends AppCompatActivity implements
 		}
 	}
 
-	public void updateRadioCode() {
+	private void updateRadioCode() {
 		TextView radioCode = (TextView) findViewById (R.id.radio_code_value);
 		radioCode.setText(mService.getRadioCode());
 	}
@@ -376,7 +376,13 @@ public class MinutisActivity extends AppCompatActivity implements
 		Snackbar sb = Snackbar.make(lv, res, Snackbar.LENGTH_LONG);
 		int sbTextId = android.support.design.R.id.snackbar_text;
 		TextView tv = (TextView) sb.getView().findViewById(sbTextId);
-		tv.setTextColor(getResources().getColor(R.color.accent));
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			tv.setTextColor(getResources().getColor(R.color.accent, null));
+		}
+		else {
+			//noinspection deprecation
+			tv.setTextColor(getResources().getColor(R.color.accent));
+		}
 		tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		sb.show();
 	}
@@ -420,7 +426,7 @@ public class MinutisActivity extends AppCompatActivity implements
 		mAdapter.changeCursor(null);
 	}
 
-	private ServiceConnection mConnection = new ServiceConnection() {
+	private final ServiceConnection mConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			MinutisService.LocalBinder binder = (MinutisService.LocalBinder) service;

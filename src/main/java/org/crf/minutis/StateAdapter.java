@@ -8,12 +8,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import java.util.List;
 
-public class StateAdapter extends BaseAdapter {
+class StateAdapter extends BaseAdapter {
 
-	private int currentStateCode;
-	private State[] mStates;
+	private final int currentStateCode;
+	private final State[] mStates;
 	private final LayoutInflater mInflater;
 
 	static class ViewHolder {

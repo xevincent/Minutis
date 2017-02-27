@@ -3,11 +3,10 @@ package org.crf.minutis;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.BaseColumns;
 
 import java.lang.StringBuilder;
 
-public class MessageDBHelper extends SQLiteOpenHelper {
+class MessageDBHelper extends SQLiteOpenHelper {
 
 	private static final int DATABASE_VERSION = 2;
 	private static final String DATABASE_NAME = "minutis.db";

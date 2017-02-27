@@ -41,10 +41,10 @@ public enum State {
 		private static final int MIN = 15;
     }
 
-	public int code, icon, iconNotif, text;
-	public long locationUpdateInterval;
+	public final int code, icon, iconNotif, text;
+	public final long locationUpdateInterval;
 
-	private State(int code, int text, int icon, int iconNotif,
+	State(int code, int text, int icon, int iconNotif,
 	              int locationUpdateInterval) {
 		this.code = code;
 		this.text = text;

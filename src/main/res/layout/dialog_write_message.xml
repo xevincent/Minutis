@@ -15,6 +15,6 @@
 	          android:inputType="textMultiLine"
 	          android:lines="8"
 	          android:minLines="6"
-	          android:gravity="top|left"
+	          android:gravity="top|start"
 	          android:scrollbars="vertical" />
 </LinearLayout>
