@@ -24,7 +24,6 @@
   <string name="state_available">Disponible</string>
   <string name="state_busy">Indisponible</string>
   <string name="state_home">Rentré</string>
-  <string name="main_messages">Messages</string>
   <string name="no_message">Aucun message reçu</string>
   <plurals name="new_message">
     <item quantity="one">%d message reçu</item>

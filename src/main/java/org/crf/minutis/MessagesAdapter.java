@@ -10,8 +10,9 @@ import android.widget.ResourceCursorAdapter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
-public class MessagesAdapter extends ResourceCursorAdapter {
+class MessagesAdapter extends ResourceCursorAdapter {
 
 	static class ViewHolder {
 		ImageView ack;
@@ -21,11 +22,12 @@ public class MessagesAdapter extends ResourceCursorAdapter {
 		TextView content;
 	}
 
-	private SimpleDateFormat sdf;
+	private final SimpleDateFormat sdf;
 
+	@SuppressWarnings("SameParameterValue")
 	public MessagesAdapter(Context context, int layout, Cursor c, int flags) {
 		super(context, layout, c, flags);
-		sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
 	}
 
 	@Override

@@ -6,6 +6,9 @@
               android:paddingTop="8dip"
               android:paddingBottom="8dip"
               android:paddingLeft="-8dip"
+              android:paddingRight="0dip"
+              android:paddingStart="-8dip"
+              android:paddingEnd="0dip"
               android:orientation="vertical"
               android:background="#FFFFFF"
               android:gravity="center_vertical" >
@@ -20,6 +23,9 @@
 		           android:gravity="top"
 		           android:layout_gravity="top"
 		           android:paddingLeft="16dp"
+		           android:paddingRight="0dp"
+		           android:paddingStart="16dp"
+		           android:paddingEnd="0dp"
 		           android:tint="@color/accent"
 		           android:src="@drawable/ic_person_black_24dp" />
 
@@ -30,6 +36,8 @@
 		          android:layout_gravity="top"
 		          android:paddingLeft="32dp"
 		          android:paddingRight="16dp"
+		          android:paddingStart="32dp"
+		          android:paddingEnd="16dp"
 		          android:textSize="16sp" />
 	</LinearLayout>
 
@@ -45,6 +53,8 @@
 		          android:layout_gravity="center_vertical"
 		          android:paddingLeft="72dp"
 		          android:paddingRight="8dp"
+		          android:paddingStart="72dp"
+		          android:paddingEnd="8dp"
 		          android:textSize="12sp"
 		          android:alpha="0.54" />
 
@@ -63,7 +73,10 @@
 		           android:layout_width="wrap_content"
 		           android:layout_height="match_parent"
 		           android:layout_gravity="center_vertical"
+		           android:paddingLeft="0dp"
 		           android:paddingRight="16dp"
+		           android:paddingStart="0dp"
+		           android:paddingEnd="16dp"
 		           android:tint="@color/accent"
 		           android:src="@drawable/ic_directions_black_24dp"
 		           android:onClick="startNavigation" />

@@ -21,7 +21,6 @@ import android.os.IBinder;
 import android.os.HandlerThread;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -64,7 +63,7 @@ public class MinutisService extends Service {
 		}
 	}
 
-	LocationListener mLocationListener = new LocationListener() {
+	private final LocationListener mLocationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {
 			if (!ioSocket.connected()) {
 				return;
@@ -75,7 +74,9 @@ public class MinutisService extends Service {
 				position.put("lat", location.getLatitude());
 				position.put("lng", location.getLongitude());
 				data.put("position", position);
-			} catch(JSONException ex) {}
+			} catch(JSONException ex) {
+				throw new RuntimeException(ex);
+			}
 			ioSocket.emit("update", data);
 		}
 
@@ -113,7 +114,9 @@ public class MinutisService extends Service {
 		}
 		try {
 			ioSocket = IO.socket(url);
-		} catch(URISyntaxException ex) {}
+		} catch(URISyntaxException ex) {
+			throw new RuntimeException(ex);
+		}
 
 		ioSocket.on(Socket.EVENT_CONNECT, onConnect);
 		ioSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
@@ -245,6 +248,7 @@ public class MinutisService extends Service {
 		return mState;
 	}
 
+	@SuppressWarnings("UnusedReturnValue")
 	public boolean updateState(int newStateCode) {
 		if (!ioSocket.connected()) {
 			return false;
@@ -252,7 +256,9 @@ public class MinutisService extends Service {
 		JSONObject state = new JSONObject();
 		try {
 			state.put("status", newStateCode);
-		} catch(JSONException ex) {}
+		} catch(JSONException ex) {
+			throw new RuntimeException(ex);
+		}
 		ioSocket.emit("update", state);
 
 		return true;
@@ -277,7 +283,9 @@ public class MinutisService extends Service {
 			message.put("text", content);
 			message.put("time", date);
 			message.put("id", id);
-		} catch(JSONException ex) {}
+		} catch(JSONException ex) {
+			throw new RuntimeException(ex);
+		}
 		ioSocket.emit("message", message);
 		notifyChanges(MESSAGES_UPDATED);
 	}
@@ -291,7 +299,7 @@ public class MinutisService extends Service {
 		bm.sendBroadcast(new Intent(action));
 	}
 
-	private Emitter.Listener onConnect = new Emitter.Listener() {
+	private final Emitter.Listener onConnect = new Emitter.Listener() {
 			@Override
 			public void call(Object... args) {
 				JSONObject phone = new JSONObject();
@@ -299,7 +307,9 @@ public class MinutisService extends Service {
 					phone.put("phone", mPrefs.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));
 					phone.put("version_name", BuildConfig.VERSION_NAME);
 					phone.put("version_code", BuildConfig.VERSION_CODE);
-				} catch(JSONException ex) {}
+				} catch(JSONException ex) {
+					throw new RuntimeException(ex);
+				}
 				ioSocket.emit("register", phone);
 				startForeground();
 				notifyChanges(CONNECTION_SUCCESS);
@@ -309,14 +319,14 @@ public class MinutisService extends Service {
 			}
 		};
 
-	private Emitter.Listener onConnectError = new Emitter.Listener() {
+	private final Emitter.Listener onConnectError = new Emitter.Listener() {
 			@Override
 			public void call(Object... args) {
 				notifyChanges(CONNECTION_ERROR);
 			}
 		};
 
-	private Emitter.Listener onDisconnect = new Emitter.Listener() {
+	private final Emitter.Listener onDisconnect = new Emitter.Listener() {
 		@Override
 		public void call(Object... args) {
 			notifyChanges(CONNECTION_DISCONNECT);
@@ -324,21 +334,23 @@ public class MinutisService extends Service {
 		}
 	};
 
-	private Emitter.Listener onReconnect = new Emitter.Listener() {
+	private final Emitter.Listener onReconnect = new Emitter.Listener() {
 		@Override
 		public void call(Object... args) {
 			notifyChanges(CONNECTION_RECONNECT);
 			JSONObject phone = new JSONObject();
 			try {
 				phone.put("phone", mPrefs.getString(SettingsFragment.KEY_PHONE_NUMBER, ""));
-			} catch(JSONException ex) {}
+			} catch(JSONException ex) {
+				throw new RuntimeException(ex);
+			}
 			ioSocket.emit("register", phone);
 			startLocation();
 			// TODO send unsend messages
 		}
 	};
 
-	private Emitter.Listener onUpdate = new Emitter.Listener() {
+	private final Emitter.Listener onUpdate = new Emitter.Listener() {
 			@Override
 			public void call(Object... args) {
 				JSONObject json = (JSONObject) args[0];
@@ -352,10 +364,12 @@ public class MinutisService extends Service {
 			}
 
 			private void updateState(JSONObject json) {
-				int newStateCode = -1;
+				int newStateCode;
 				try {
 					newStateCode = json.getInt("status");
-				} catch(JSONException ex) {}
+				} catch(JSONException ex) {
+					newStateCode = -1;
+				}
 				for(State state: State.values()) {
 					if (state.code == newStateCode) {
 						mState = state;
@@ -367,10 +381,12 @@ public class MinutisService extends Service {
 			}
 
 			private void updateRadioCode(JSONObject json) {
-				String newRadioCode = "";
+				String newRadioCode;
 				try {
 					newRadioCode = json.getString("indicatif");
-				} catch(JSONException ex) {}
+				} catch(JSONException ex) {
+					newRadioCode = "";
+				}
 				if (!newRadioCode.isEmpty()) {
 					mRadioCode = newRadioCode;
 					notifyChanges(RADIO_CODE_UPDATED);
@@ -378,7 +394,7 @@ public class MinutisService extends Service {
 			}
 		};
 
-	private Emitter.Listener onMessage = new Emitter.Listener() {
+	private final Emitter.Listener onMessage = new Emitter.Listener() {
 		@Override
 		public void call(Object... args) {
 			JSONObject json = (JSONObject) args[0];
@@ -403,12 +419,16 @@ public class MinutisService extends Service {
 				try {
 					message.put("id", json.getString("id"));
 					ioSocket.emit("ackMessage", message);
-				} catch(JSONException ex) {}
-			} catch(JSONException ex) {}
+				} catch(JSONException ex) {
+					throw new RuntimeException(ex);
+				}
+			} catch(JSONException ex) {
+				throw new RuntimeException(ex);
+			}
 		}
 	};
 
-	private Emitter.Listener onAckMessage = new Emitter.Listener() {
+	private final Emitter.Listener onAckMessage = new Emitter.Listener() {
 		@Override
 		public void call(Object... args) {
 			JSONObject json = (JSONObject) args[0];
@@ -422,7 +442,9 @@ public class MinutisService extends Service {
 				db.update("messages", cv, "uuid=?", new String[] {uuid});
 				helper.close();
 				notifyChanges(MESSAGES_UPDATED);
-			} catch(JSONException ex) {}
+			} catch(JSONException ex) {
+				throw new RuntimeException(ex);
+			}
 		}
 	};
 }

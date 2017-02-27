@@ -11,6 +11,7 @@
     <application android:label="@string/app_name"
 				 android:icon="@drawable/ic_logo"
 				 android:name="MinutisApplication"
+				 android:supportsRtl="false"
 				 android:theme="@style/MinutisTheme" >
         <activity android:name="MinutisActivity"
                   android:label="@string/app_name"
